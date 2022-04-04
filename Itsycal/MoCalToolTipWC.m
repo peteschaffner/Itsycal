@@ -90,7 +90,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showTooltip) object:nil];
     if (self.window.occlusionState & NSWindowOcclusionStateVisible &&
         _fadeTimer == nil) {
-        _fadeTimer = [NSTimer scheduledTimerWithTimeInterval:1/30. target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+        _fadeTimer = [NSTimer scheduledTimerWithTimeInterval:1/75. target:self selector:@selector(tick:) userInfo:nil repeats:YES];
     }
 }
 
@@ -124,7 +124,6 @@
     self = [super initWithContentRect:NSZeroRect styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered defer:NO];
     if (self) {
         self.backgroundColor = [NSColor clearColor];
-        self.opaque = NO;
         self.level = NSPopUpMenuWindowLevel;
         self.movableByWindowBackground = NO;
         self.ignoresMouseEvents = YES;
@@ -132,6 +131,24 @@
 
         // Draw tooltip background and fix tooltip width.
         self.contentView = [MoCalTooltipContentView new];
+		self.contentView.wantsLayer = YES;
+		self.contentView.layer.masksToBounds = YES;
+		self.contentView.layer.cornerRadius = 6.0;
+		if (@available(macOS 10.15, *)) {
+			self.contentView.layer.cornerCurve = kCACornerCurveContinuous;
+		}
+		
+		CALayer *innerStroke = [CALayer new];
+		innerStroke.frame = self.contentView.bounds;
+		innerStroke.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+		innerStroke.cornerRadius = 6.0;
+		if (@available(macOS 10.15, *)) {
+			innerStroke.cornerCurve = kCACornerCurveContinuous;
+		}
+		innerStroke.borderColor = [NSColor.whiteColor colorWithAlphaComponent:0.2].CGColor;
+		innerStroke.borderWidth = 1.0;
+		[self.contentView.layer addSublayer:innerStroke];
+		
         _tooltipWidthConstraint = [self.contentView.widthAnchor constraintEqualToConstant:SizePref.tooltipWidth];
         _tooltipWidthConstraint.active = YES;
         
@@ -153,16 +170,9 @@
 
 @implementation MoCalTooltipContentView
 
-- (void)drawRect:(NSRect)dirtyRect
+- (void)updateLayer
 {
-    // A rounded rect with a light gray border.
-    NSRect r = NSInsetRect(self.bounds, 1, 1);
-    NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect:r xRadius:5 yRadius:5];
-    [Theme.windowBorderColor setStroke];
-    [p setLineWidth:2];
-    [p stroke];
-    [Theme.tooltipBackgroundColor setFill];
-    [p fill];
+	self.layer.backgroundColor = Theme.tooltipBackgroundColor.CGColor;
 }
 
 @end
