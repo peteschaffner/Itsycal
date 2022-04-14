@@ -99,11 +99,11 @@
     [v addSubview:agenda];
 
     // Constraints
-    MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:v metrics:nil views:NSDictionaryOfVariableBindings(_moCal, _btnAdd, _btnCal, _btnOpt, _btnPin, agenda)];
+    MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:v metrics:nil views:NSDictionaryOfVariableBindings(_moCal, _btnAdd, _btnOpt, _btnPin, agenda)];
     [vfl :@"H:|-2-[_moCal]-2-|"];
     [vfl :@"H:|[agenda]|"];
-    [vfl :@"H:|-8-[_btnAdd]-(>=0)-[_btnPin]-6-[_btnCal]-6-[_btnOpt]-8-|" :NSLayoutFormatAlignAllCenterY];
-    [vfl :@"V:|-10-[_moCal]-6-[_btnOpt(22)]-1-[agenda]-7-|"];
+    [vfl :@"H:|-8-[_btnAdd]-(>=0)-[_btnPin]-6-[_btnOpt]-8-|" :NSLayoutFormatAlignAllCenterY];
+    [vfl :@"V:|-10-[_moCal]-6-[agenda]-8-[_btnOpt(22)]-8-|"];
     
     self.view = v;
 }
