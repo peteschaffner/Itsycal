@@ -29,7 +29,6 @@
 		9242A5671A82A136005AA4B3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9242A5661A82A136005AA4B3 /* Images.xcassets */; };
 		9242A56A1A82A136005AA4B3 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9242A5681A82A136005AA4B3 /* MainMenu.xib */; };
 		9242A5841A82A189005AA4B3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9242A5831A82A189005AA4B3 /* ViewController.m */; };
-		9242A5871A82A1A1005AA4B3 /* ItsycalWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9242A5861A82A1A1005AA4B3 /* ItsycalWindow.m */; };
 		9242A5901A82A40B005AA4B3 /* MoDate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9242A5891A82A40B005AA4B3 /* MoDate.m */; };
 		9242A5911A82A40B005AA4B3 /* MoCalCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9242A58B1A82A40B005AA4B3 /* MoCalCell.m */; };
 		9242A5921A82A40B005AA4B3 /* MoCalGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 9242A58D1A82A40B005AA4B3 /* MoCalGrid.m */; };
@@ -47,6 +46,7 @@
 		929223EB1E2D6E0900F1A119 /* HighlightPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 929223EA1E2D6E0800F1A119 /* HighlightPicker.m */; };
 		92B28CCF210BD17500485AE2 /* Sizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 92B28CCE210BD17500485AE2 /* Sizer.m */; };
 		92CDDE7B1A955D7F00D7675C /* AgendaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */; };
+		C1CF1205280AEC5D0046B232 /* OpaquePopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1CF1204280AEC5D0046B232 /* OpaquePopoverViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -123,8 +123,6 @@
 		9242A5691A82A136005AA4B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9242A5821A82A189005AA4B3 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		9242A5831A82A189005AA4B3 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		9242A5851A82A1A1005AA4B3 /* ItsycalWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItsycalWindow.h; sourceTree = "<group>"; };
-		9242A5861A82A1A1005AA4B3 /* ItsycalWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItsycalWindow.m; sourceTree = "<group>"; };
 		9242A5881A82A40B005AA4B3 /* MoDate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoDate.h; sourceTree = "<group>"; };
 		9242A5891A82A40B005AA4B3 /* MoDate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoDate.m; sourceTree = "<group>"; };
 		9242A58A1A82A40B005AA4B3 /* MoCalCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoCalCell.h; sourceTree = "<group>"; };
@@ -158,6 +156,8 @@
 		92B28CCE210BD17500485AE2 /* Sizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Sizer.m; sourceTree = "<group>"; };
 		92CDDE791A955D7F00D7675C /* AgendaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgendaViewController.h; sourceTree = "<group>"; };
 		92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgendaViewController.m; sourceTree = "<group>"; };
+		C1CF1203280AEC5D0046B232 /* OpaquePopoverViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpaquePopoverViewController.h; sourceTree = "<group>"; };
+		C1CF1204280AEC5D0046B232 /* OpaquePopoverViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpaquePopoverViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,8 +235,6 @@
 				9242A5951A82BE5E005AA4B3 /* Itsycal.m */,
 				9242A5821A82A189005AA4B3 /* ViewController.h */,
 				9242A5831A82A189005AA4B3 /* ViewController.m */,
-				9242A5851A82A1A1005AA4B3 /* ItsycalWindow.h */,
-				9242A5861A82A1A1005AA4B3 /* ItsycalWindow.m */,
 				92CDDE7C1A97FFE700D7675C /* MoCode */,
 				9228A5A5210509910076BFFC /* Prefs */,
 				929223E91E2D6E0800F1A119 /* HighlightPicker.h */,
@@ -245,6 +243,8 @@
 				922232CC1A8DF672003BFAD9 /* EventCenter.m */,
 				92CDDE791A955D7F00D7675C /* AgendaViewController.h */,
 				92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */,
+				C1CF1203280AEC5D0046B232 /* OpaquePopoverViewController.h */,
+				C1CF1204280AEC5D0046B232 /* OpaquePopoverViewController.m */,
 				925B47191A93CD2A00E0329A /* TooltipViewController.h */,
 				925B471A1A93CD2A00E0329A /* TooltipViewController.m */,
 				92658E601A9DBD8E002AE86C /* EventViewController.h */,
@@ -440,6 +440,7 @@
 				9242A5931A82A40B005AA4B3 /* MoCalendar.m in Sources */,
 				9242A5911A82A40B005AA4B3 /* MoCalCell.m in Sources */,
 				9224B0751A8BE75500D63030 /* MoButton.m in Sources */,
+				C1CF1205280AEC5D0046B232 /* OpaquePopoverViewController.m in Sources */,
 				9242A5841A82A189005AA4B3 /* ViewController.m in Sources */,
 				924C518C1E5F721C0049E3A9 /* MoCalResizeHandle.m in Sources */,
 				921E62CD1E26B3EA007B029F /* PrefsGeneralVC.m in Sources */,

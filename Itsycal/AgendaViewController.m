@@ -13,6 +13,7 @@
 #import "MoVFLHelper.h"
 #import "Themer.h"
 #import "Sizer.h"
+#import "OpaquePopoverViewController.h"
 
 static NSString *kColumnIdentifier    = @"Column";
 static NSString *kDateCellIdentifier  = @"DateCell";
@@ -41,7 +42,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @property (nonatomic) BOOL dim;
 @end
 
-@interface AgendaPopoverVC : NSViewController
+@interface AgendaPopoverVC : OpaquePopoverViewController
 @property (nonatomic, weak) NSCalendar *nsCal;
 @property (nonatomic) NSButton *btnDelete;
 - (void)populateWithEventInfo:(EventInfo *)info;

@@ -11,8 +11,9 @@
 #import "EventCenter.h"
 #import "AgendaViewController.h"
 #import "TooltipViewController.h"
+#import "OpaquePopoverViewController.h"
 
-@interface ViewController : NSViewController <NSWindowDelegate, AgendaDelegate, MoCalendarDelegate, EventCenterDelegate, TooltipViewControllerDelegate, NSPopoverDelegate>
+@interface ViewController : OpaquePopoverViewController <NSWindowDelegate, AgendaDelegate, MoCalendarDelegate, EventCenterDelegate, TooltipViewControllerDelegate, NSPopoverDelegate>
 
 - (void)keyboardShortcutActivated;
 - (void)removeStatusItem;

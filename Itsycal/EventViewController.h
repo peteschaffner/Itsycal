@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "OpaquePopoverViewController.h"
 
 @class EventCenter;
 
-@interface EventViewController : NSViewController <NSTextFieldDelegate, NSTextViewDelegate>
+@interface EventViewController : OpaquePopoverViewController <NSTextFieldDelegate, NSTextViewDelegate>
 
 @property (nonatomic, weak) EventCenter *ec;
 @property (nonatomic, weak) NSPopover *enclosingPopover;

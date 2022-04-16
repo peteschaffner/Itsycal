@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import "Itsycal.h"
-#import "ItsycalWindow.h"
 #import "ViewController.h"
 #import "Themer.h"
 #import "Sizer.h"
@@ -96,7 +95,7 @@
     [SizePref bind:@"sizePreference" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:[@"values." stringByAppendingString:kSizePreference] options:@{NSContinuouslyUpdatesValueBindingOption: @(YES)}];
 
     ViewController *vc = [ViewController new];
-    _wc = [[NSWindowController alloc] initWithWindow:[ItsycalWindow  new]];
+    _wc = [[NSWindowController alloc] initWithWindow:[NSWindow new]];
     _wc.contentViewController = vc;
     _wc.window.delegate = vc;
     
