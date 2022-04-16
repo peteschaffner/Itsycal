@@ -60,7 +60,7 @@ Themer *Theme = nil;
 }
 
 - (NSColor *)agendaDividerColor {
-    return NSColor.separatorColor;
+	return [NSColor colorNamed:@"AgendaDividerColor"];
 }
 
 - (NSColor *)agendaDOWTextColor {
