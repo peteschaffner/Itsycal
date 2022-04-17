@@ -715,7 +715,6 @@
     [_agendaVC.view setNeedsLayout:YES];
 }
 
-
 - (void)statusItemClicked:(id)sender
 {
     // If there are multiple screens and Itsycal is showing
@@ -760,6 +759,7 @@
 	[self positionItsycalWindow];
 	if (!_itsycalPopover) {
 		_itsycalPopover = [NSPopover new];
+		_itsycalPopover.animates = NO;
 		_itsycalPopover.delegate = self;
 		_itsycalPopover.contentViewController = self;
 	}
@@ -773,16 +773,6 @@
 - (void)windowDidResize:(NSNotification *)notification
 {
     [self positionItsycalWindow];
-}
-
-- (void)popoverWillShow:(NSNotification *)notification
-{
-	_itsycalPopover.animates = YES;
-}
-
-- (void)popoverWillClose:(NSNotification *)notification
-{
-	_itsycalPopover.animates = NO;
 }
 
 - (void)popoverDidClose:(NSNotification *)notification
