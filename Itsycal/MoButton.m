@@ -38,20 +38,6 @@
     return self.image.size;
 }
 
-- (void)setImage:(NSImage *)image
-{
-    [super setImage:image];
-    // Create a default alternateImage. We will use
-    // this as the alternate image if the user doesn't
-    // provide one of their own.
-    self.alternateImage = [NSImage imageWithSize:image.size flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
-        [image drawInRect:dstRect];
-        [NSColor.controlAccentColor set];
-        NSRectFillUsingOperation(dstRect, NSCompositingOperationSourceAtop);
-        return YES;
-    }];
-}
-
 - (void)setEnabled:(BOOL)enabled
 {
     [super setEnabled:enabled];

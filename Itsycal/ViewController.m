@@ -89,7 +89,12 @@
     _btnOpt = btn(@"btnOpt", NSLocalizedString(@"Options", @""), @"", @selector(showOptionsMenu:));
     _btnPin = btn(@"btnPin", NSLocalizedString(@"Pin Itsycal   P", @""), @"p", @selector(pin:));
     _btnPin.keyEquivalentModifierMask = 0;
-    _btnPin.alternateImage = [NSImage imageNamed:@"btnPinAlt"];
+	_btnPin.alternateImage = [NSImage imageWithSize:_btnPin.image.size flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
+		[self->_btnPin.image drawInRect:dstRect];
+		[NSColor.controlAccentColor set];
+		NSRectFillUsingOperation(dstRect, NSCompositingOperationSourceAtop);
+		return YES;
+	}];
     [_btnPin setButtonType:NSButtonTypeToggle];
     
     // Agenda
