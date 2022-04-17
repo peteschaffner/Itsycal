@@ -773,6 +773,7 @@
 	[self.view.window makeKeyAndOrderFront:self];
 	[self.view.window makeFirstResponder:_moCal];
     _inactiveTime = 0;
+	[_statusItem.button setHighlighted:YES];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
@@ -788,6 +789,7 @@
 	
 	if (notification.object == _itsycalPopover) {
 		[self.view.window orderOut:self];
+		[_statusItem.button highlight:NO];
 		_inactiveTime = MonotonicClockTime();
 		_itsycalPopover = nil;
 	}
@@ -1249,6 +1251,15 @@
     else if ([keyPath isEqualToString:kClockFormat]) {
         [self clockFormatDidChange];
     }
+}
+
+@end
+
+@implementation NSStatusBarButton (Additions)
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	[(ViewController *)self.target statusItemClicked:self];
 }
 
 @end
