@@ -10,7 +10,7 @@
 
 @implementation MoButton
 {
-    NSBox *_hoverBox;
+	CALayer *_hoverLayer;
 }
 
 - (instancetype)initWithFrame:(NSRect)frameRect
@@ -20,15 +20,13 @@
         self.bordered = NO;
         self.imagePosition = NSImageOnly;
         [self setButtonType:NSButtonTypeMomentaryChange];
-        _hoverBox = [NSBox new];
-        _hoverBox.boxType = NSBoxCustom;
-        _hoverBox.borderWidth = 0;
-        _hoverBox.cornerRadius = 4;
-        _hoverBox.alphaValue = 0.08;
-        _hoverBox.fillColor = NSColor.clearColor;
-        _hoverBox.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-        _hoverBox.frame = self.bounds;
-        [self addSubview:_hoverBox];
+		self.wantsLayer = YES;
+		_hoverLayer = [CALayer new];
+		_hoverLayer.frame = self.bounds;
+		_hoverLayer.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+		_hoverLayer.cornerRadius = 4;
+		_hoverLayer.cornerCurve = kCACornerCurveContinuous;
+		[self.layer addSublayer:_hoverLayer];
     }
     return self;
 }
@@ -99,8 +97,13 @@
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         context.duration = 0.15;
-        _hoverBox.animator.fillColor = show && self.enabled ? NSColor.controlTextColor : NSColor.clearColor;
+		_hoverLayer.opacity = show && self.enabled ? 0.08 : 0;
     }];
+}
+
+- (void)updateLayer
+{
+	_hoverLayer.backgroundColor = NSColor.labelColor.CGColor;
 }
 
 @end
