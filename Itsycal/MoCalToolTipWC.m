@@ -139,7 +139,6 @@
 		}
 		
 		CALayer *innerStroke = [CALayer new];
-		innerStroke.frame = self.contentView.bounds;
 		innerStroke.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
 		innerStroke.cornerRadius = 6.0;
 		if (@available(macOS 10.15, *)) {

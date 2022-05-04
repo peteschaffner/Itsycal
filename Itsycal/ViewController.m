@@ -536,30 +536,13 @@
     }
     if (_clockFormat) {
         [_iconDateFormatter setDateFormat:_clockFormat];
-        // After updating the Xcode Deployment Target to macOS 10.14 from
-        // macOS 10.12, the button title renders slightly higher than it should
-        // on Mojave and slightly lower than it should on Catalina.
-        // As a workaround, instead of setting the title with an NSString,
-        // provide an NSAttributedString with a baseline offset.
-        CGFloat scaleFactor = NSScreen.mainScreen.backingScaleFactor ?: 2.0;
-        CGFloat baselineOffset = -1.0 / scaleFactor;
-        if (@available(macOS 10.15, *)) {
-            baselineOffset = 0.5;
-        }
-        if (@available(macOS 11, *)) {
-            baselineOffset = 0;
-        }
-        if ([defaults objectForKey:kBaselineOffset]) {
-            baselineOffset = [defaults floatForKey:kBaselineOffset];
-            baselineOffset = MIN(2.0, MAX(-2.0, baselineOffset));
-        }
         NSString *buttonText = [_iconDateFormatter stringFromDate:[NSDate new]];
         accessibilityTitle = [accessibilityTitle stringByAppendingFormat:@", %@", buttonText];
         if (!hideIcon) {
             // Prepend a space to _clockFormat text to separate it from icon.
             buttonText = [@" " stringByAppendingString:buttonText];
         }
-        _statusItem.button.attributedTitle = [[NSAttributedString alloc] initWithString:buttonText attributes:@{NSBaselineOffsetAttributeName: @(baselineOffset)}];
+		_statusItem.button.title = buttonText;
     }
     _statusItem.button.accessibilityTitle = accessibilityTitle;
     [self adjustStatusItemWidthIfNecessary];
