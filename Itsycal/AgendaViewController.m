@@ -909,10 +909,10 @@ static NSString *kEventCellIdentifier = @"EventCell";
         _URL = textview();
         
         _btnDelete = [NSButton new];
-        _btnDelete.title = @"⌫";
+		_btnDelete.bordered = NO;
+		_btnDelete.imagePosition = NSImageOnly;
+		_btnDelete.image = [[NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:NULL] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleSmall]];
         _btnDelete.focusRingType = NSFocusRingTypeNone;
-        _btnDelete.bordered = NO;
-        _btnDelete.contentTintColor = NSColor.secondaryLabelColor;
         
         NSView *titleHolder = [NSView new];
         [titleHolder addSubview:_title];
