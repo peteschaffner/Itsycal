@@ -283,6 +283,12 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
 - (void)viewWillAppear
 {
     [super viewWillAppear];
+	
+	if (self.view.window.appearance.name == NSAppearanceNameAqua) {
+		[self.view setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantLight]];
+	} else {
+		[self.view setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
+	}
 
     self.view.window.defaultButtonCell = _saveButton.cell;
     
