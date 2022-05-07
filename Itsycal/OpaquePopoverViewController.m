@@ -24,7 +24,7 @@
 	backgroundColorView.identifier = @"popoverBackgroundBox";
 	backgroundColorView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 	backgroundColorView.boxType = NSBoxCustom;
-	backgroundColorView.borderType = NSNoBorder;
+	backgroundColorView.borderColor = NSColor.clearColor;
 	backgroundColorView.fillColor = Theme.mainBackgroundColor;
 	[frameView addSubview:backgroundColorView positioned:NSWindowBelow relativeTo:nil];
 }
