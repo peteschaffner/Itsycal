@@ -97,8 +97,8 @@ static NSString *kSelectedCalendars = @"SelectedCalendars";
     return [EKEvent eventWithEventStore:_store];
 }
 
-- (BOOL)saveEvent:(EKEvent *)event error:(NSError **)error {
-    return [_store saveEvent:event span:EKSpanThisEvent commit:YES error:error];
+- (BOOL)saveEvent:(EKEvent *)event span:(EKSpan)span error:(NSError **)error {
+    return [_store saveEvent:event span:span commit:YES error:error];
 }
 
 - (BOOL)removeEvent:(EKEvent *)event span:(EKSpan)span error:(NSError **)error {
@@ -180,6 +180,10 @@ static NSString *kSelectedCalendars = @"SelectedCalendars";
         [self->_store reset];
         [self->_store refreshSourcesIfNecessary];
     });
+}
+
+- (nullable EKEvent *)eventWithIdentifier:(NSString *)identifier {
+	return [_store eventWithIdentifier:identifier];
 }
 
 #pragma mark - Private (GCD thread pool)

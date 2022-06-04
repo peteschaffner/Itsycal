@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "MoTableView.h"
+#import "EventCenter.h"
 
 @protocol AgendaDelegate;
 
@@ -28,6 +29,8 @@
 @class EKEvent;
 
 @protocol AgendaDelegate <NSObject>
+
+@property (nonatomic) EventCenter *ec;
 
 @optional
 - (void)agendaHoveredOverRow:(NSInteger)row;
