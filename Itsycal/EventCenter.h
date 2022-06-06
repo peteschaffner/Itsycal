@@ -31,7 +31,7 @@
 
 - (EKEvent *)newEvent;
 
-- (BOOL)saveEvent:(EKEvent *)event span:(EKSpan)span error:(NSError **)error;
+- (BOOL)saveEvent:(EKEvent *)event error:(NSError **)error;
 
 - (BOOL)removeEvent:(EKEvent *)event span:(EKSpan)span error:(NSError **)error;
 
@@ -57,8 +57,6 @@
 
 // Refresh event store.
 - (void)refresh;
-
-- (nullable EKEvent *)eventWithIdentifier:(NSString *)identifier;
 
 @end
 

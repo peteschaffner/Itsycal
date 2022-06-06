@@ -24,6 +24,7 @@
 
 @implementation ViewController
 {
+    EventCenter   *_ec;
     MoCalendar    *_moCal;
     NSCalendar    *_nsCal;
     NSStatusItem  *_statusItem;
@@ -44,8 +45,6 @@
     NSPopover *_newEventPopover;
 	NSPopover *_itsycalPopover;
 }
-
-@synthesize ec;
 
 - (void)dealloc
 {
@@ -142,7 +141,7 @@
     
     [self createStatusItem];
     
-    self.ec = [[EventCenter alloc] initWithCalendar:_nsCal delegate:self];
+    _ec = [[EventCenter alloc] initWithCalendar:_nsCal delegate:self];
     
     TooltipViewController *tooltipVC = [TooltipViewController new];
     tooltipVC.tooltipDelegate = self;
@@ -209,7 +208,7 @@
         [self showPrefs:self];
     }
     else if (keyChar == 'r' && cmdOptFlag) {
-        [self.ec refresh];
+        [_ec refresh];
     }
     else if (keyChar == 'j' && cmdFlag) {
         if (![_agendaVC clickFirstActiveZoomButton]) NSBeep();
@@ -242,7 +241,7 @@
     
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     
-    if (self.ec.calendarAccessGranted == NO) {
+    if (_ec.calendarAccessGranted == NO) {
         NSAlert *alert = [NSAlert new];
         alert.messageText = NSLocalizedString(@"Calendar access was denied.", @"");
         alert.informativeText = NSLocalizedString(@"Itsycal is more useful when you allow it to add events to your calendars. You can change this setting in System Preferences › Security & Privacy › Privacy.", @"");
@@ -252,7 +251,7 @@
     
     // Confirm that there are calendars which can be modified.
     BOOL atLeastOneModifiableCalendar = NO;
-    for (id obj in [self.ec sourcesAndCalendars]) {
+    for (id obj in [_ec sourcesAndCalendars]) {
         if ([obj isKindOfClass:[CalendarInfo class]] && 
             ((CalendarInfo *)obj).calendar.allowsContentModifications) {
             atLeastOneModifiableCalendar = YES;
@@ -273,7 +272,7 @@
         _newEventPopover.delegate = self;
     }
     EventViewController *eventVC = [EventViewController new];
-    eventVC.ec = self.ec;
+    eventVC.ec = _ec;
     eventVC.enclosingPopover = _newEventPopover;
     eventVC.cal = _nsCal;
     eventVC.title = @"";
@@ -383,7 +382,7 @@
         PrefsGeneralVC *prefsGeneralVC = [PrefsGeneralVC new];
         PrefsAppearanceVC *prefsAppearanceVC = [PrefsAppearanceVC new];
         PrefsAboutVC *prefsAboutVC = [PrefsAboutVC new];
-        prefsGeneralVC.ec = self.ec;
+        prefsGeneralVC.ec = _ec;
         prefsGeneralVC.title = NSLocalizedString(@"General", @"General prefs tab label");
         prefsAppearanceVC.title = NSLocalizedString(@"Appearance", @"Appearance prefs tab label");
         prefsAboutVC.title = NSLocalizedString(@"About", @"About prefs tab label");
@@ -875,7 +874,7 @@
     // Delete this event (or future events).
     NSError *error = NULL;
     EKSpan span = (eventRepeats && response == NSAlertSecondButtonReturn) ? EKSpanFutureEvents : EKSpanThisEvent;
-    BOOL result = [self.ec removeEvent:event span:span error:&error];
+    BOOL result = [_ec removeEvent:event span:span error:&error];
     if (result == NO && error != nil) {
         [[NSAlert alertWithError:error] runModal];
     }
@@ -899,7 +898,7 @@
     // Attempt to reload cached events. If this works,
     // the display will update fast. Then fetch.
     [_moCal reloadData];
-    [self.ec fetchEvents];
+    [_ec fetchEvents];
 }
 
 - (void)calendarSelectionChanged:(MoCalendar *)cal
@@ -1237,7 +1236,7 @@
     [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemTimeZoneDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
         [self updateMenubarIcon];
         [self updateTimer];
-        [self.ec refetchAll];
+        [self->_ec refetchAll];
     }];
     
     // Locale notifications
@@ -1251,7 +1250,7 @@
     [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
         [self updateMenubarIcon];
         [self updateTimer];
-        [self.ec refetchAll];
+        [self->_ec refetchAll];
     }];
 
     // Wake from sleep notification

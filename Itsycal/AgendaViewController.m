@@ -14,7 +14,6 @@
 #import "Themer.h"
 #import "Sizer.h"
 #import "OpaquePopoverViewController.h"
-#import "EventViewController.h"
 
 static NSString *kColumnIdentifier    = @"Column";
 static NSString *kDateCellIdentifier  = @"DateCell";
@@ -71,7 +70,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // Calendars table view
     _tv = [MoTableView new];
     _tv.target = self;
-	_tv.action = @selector(updateCalendarEvent:);
+    _tv.action = @selector(showPopover:);
     _tv.doubleAction = @selector(showCalendarApp:);
     _tv.menu = [NSMenu new];
     _tv.menu.delegate = self;
@@ -227,49 +226,42 @@ static NSString *kEventCellIdentifier = @"EventCell";
 #pragma mark -
 #pragma mark TableView click actions
 
-- (void)updateCalendarEvent:(id)sender
+- (void)showPopover:(id)sender
 {
-	if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
-	
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		self->_popover = [NSPopover new];
-		self->_popover.contentViewController = [AgendaPopoverVC new];
-		self->_popover.behavior = NSPopoverBehaviorTransient;
-		self->_popover.animates = NO;
-	});
-	
-	AgendaEventCell *cell = [_tv viewAtColumn:0 row:_tv.clickedRow makeIfNecessary:NO];
-	
-	if (!cell) return; // should never happen
-	
-	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-	EKEvent *event = cell.eventInfo.event;
-	
-	EventViewController *eventVC = [EventViewController new];
-	eventVC.ec = self.delegate.ec;
-	eventVC.enclosingPopover = _popover;
-	eventVC.cal = _nsCal;
-	eventVC.title = @"";
-	eventVC.calSelectedDate = [self.nsCal startOfDayForDate:event.startDate];
-	eventVC.eventId = event.eventIdentifier;
-	eventVC.eventTitleString = event.title;
-	eventVC.locationString = event.location;
-	eventVC.calendarIdentifier = event.calendar.calendarIdentifier;
-	eventVC.startDateValue = event.startDate;
-	eventVC.endDateValue = event.endDate;
-	eventVC.allDay = event.allDay;
-	if (event.hasRecurrenceRules) {
-		eventVC.recurrenceRule = event.recurrenceRules.firstObject;
-	}
-	if (event.hasAlarms) {	
-		eventVC.alert = event.alarms.firstObject;
-	}
-	
-	_popover.contentViewController = eventVC;
-	_popover.appearance = NSApp.effectiveAppearance;
-	NSRect positionRect = NSInsetRect([_tv rectOfRow:_tv.clickedRow], 8, 0);
-	[_popover showRelativeToRect:positionRect ofView:_tv preferredEdge:NSRectEdgeMinX];
+    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        self->_popover = [NSPopover new];
+        self->_popover.contentViewController = [AgendaPopoverVC new];
+        self->_popover.behavior = NSPopoverBehaviorTransient;
+        self->_popover.animates = NO;
+    });
+    
+    AgendaEventCell *cell = [_tv viewAtColumn:0 row:_tv.clickedRow makeIfNecessary:NO];
+    
+    if (!cell) return; // should never happen
+    
+    AgendaPopoverVC *popoverVC = (AgendaPopoverVC *)_popover.contentViewController;
+    [popoverVC setNsCal:self.nsCal];
+    [popoverVC populateWithEventInfo:cell.eventInfo];
+    
+    if (cell.eventInfo.event.calendar.allowsContentModifications) {
+        popoverVC.btnDelete.tag = _tv.clickedRow;
+        popoverVC.btnDelete.target = self;
+        popoverVC.btnDelete.action = @selector(deleteEvent:);
+        unichar backspaceKey = NSBackspaceCharacter;
+        popoverVC.btnDelete.keyEquivalent = [NSString stringWithCharacters:&backspaceKey length:1];
+    }
+    
+    NSRect positionRect = NSInsetRect([_tv rectOfRow:_tv.clickedRow], 8, 0);
+    [_popover setAppearance:NSApp.effectiveAppearance];
+    [_popover showRelativeToRect:positionRect ofView:_tv preferredEdge:NSRectEdgeMinX];
+    [_popover setContentSize:popoverVC.size];
+    [popoverVC scrollToTopAndFlashScrollers];
+    
+    // Prevent popoverVC's _note from eating key presses (like esc and delete).
+    [popoverVC.view.window makeFirstResponder:popoverVC.btnDelete];
 }
 
 - (void)showCalendarApp:(id)sender
