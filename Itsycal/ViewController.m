@@ -786,6 +786,9 @@
 		_inactiveTime = MonotonicClockTime();
 		_itsycalPopover = nil;
 	}
+	
+	// Reset calendar position so when reopening you see today's agenda
+	[_moCal showTodayMonth:self];
 }
 
 - (void)keyboardShortcutActivated
