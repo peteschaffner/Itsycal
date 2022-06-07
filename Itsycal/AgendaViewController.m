@@ -45,6 +45,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @interface AgendaPopoverVC : OpaquePopoverViewController
 @property (nonatomic, weak) NSCalendar *nsCal;
 @property (nonatomic) NSButton *btnDelete;
+@property (nonatomic) NSButton *btnShowCalApp;
 - (void)populateWithEventInfo:(EventInfo *)info;
 - (void)scrollToTopAndFlashScrollers;
 - (NSSize)size;
@@ -253,6 +254,10 @@ static NSString *kEventCellIdentifier = @"EventCell";
         unichar backspaceKey = NSBackspaceCharacter;
         popoverVC.btnDelete.keyEquivalent = [NSString stringWithCharacters:&backspaceKey length:1];
     }
+	
+	popoverVC.btnShowCalApp.tag = [_tv rowForView:cell];
+	popoverVC.btnShowCalApp.target = self;
+	popoverVC.btnShowCalApp.action = @selector(showCalendarApp:);
     
     NSRect positionRect = NSInsetRect([_tv rectOfRow:_tv.clickedRow], 8, 0);
     [_popover setAppearance:NSApp.effectiveAppearance];
@@ -266,14 +271,19 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
 - (void)showCalendarApp:(id)sender
 {
-    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
+	NSInteger row = -1;
+	if ([sender isKindOfClass:[NSButton class]]) {
+		NSButton *button = (NSButton *)sender;
+		row = button.tag;
+	} else if (_tv.clickedRow != -1 || ![self tableView:_tv isGroupRow:_tv.clickedRow]) {
+		row = _tv.clickedRow;
+	} else return;
 
     // Work backwards from the clicked row (which is an EventInfo row)
     // to find the parent NSDate row. We do this instead of just getting
     // the clicked event's startDate because spanning events might start
     // on a different date from the one that was clicked.
     NSDate *clickedDate = nil;
-    NSInteger row = _tv.clickedRow;
     while (row > 0) {
         row = row - 1;
         id obj = self.events[row];
@@ -913,12 +923,19 @@ static NSString *kEventCellIdentifier = @"EventCell";
 		_btnDelete.imagePosition = NSImageOnly;
 		_btnDelete.image = [[NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:NULL] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleSmall]];
         _btnDelete.focusRingType = NSFocusRingTypeNone;
+		
+		_btnShowCalApp = [NSButton new];
+		_btnShowCalApp.bordered = NO;
+		_btnShowCalApp.imagePosition = NSImageOnly;
+		_btnShowCalApp.image = [[NSImage imageWithSystemSymbolName:@"arrow.right.circle" accessibilityDescription:NULL] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithPointSize:10 weight:NSFontWeightSemibold]];
+		_btnShowCalApp.focusRingType = NSFocusRingTypeNone;
         
         NSView *titleHolder = [NSView new];
         [titleHolder addSubview:_title];
         [titleHolder addSubview:_btnDelete];
-        MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:titleHolder metrics:nil views:NSDictionaryOfVariableBindings(_title, _btnDelete)];
-        [vfl :@"H:|[_title]-(>=10)-[_btnDelete]|" :NSLayoutFormatAlignAllCenterY];
+		[titleHolder addSubview:_btnShowCalApp];
+        MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:titleHolder metrics:nil views:NSDictionaryOfVariableBindings(_title, _btnShowCalApp, _btnDelete)];
+        [vfl :@"H:|[_title]-2-[_btnShowCalApp]-(>=10)-[_btnDelete]|" :NSLayoutFormatAlignAllCenterY];
         [vfl :@"V:|[_title]|"];
         [titleHolder.widthAnchor constraintEqualToConstant:POPOVER_TEXT_WIDTH].active = YES;
         
