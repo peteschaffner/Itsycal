@@ -22,6 +22,9 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @interface ThemedScroller : NSScroller
 @end
 
+@interface PassThroughGridView : NSGridView
+@end
+
 @interface AgendaRowView : NSTableRowView
 @property (nonatomic) BOOL isHovered;
 @end
@@ -33,13 +36,15 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @end
 
 @interface AgendaEventCell : NSView
-@property (nonatomic) NSGridView *grid;
+@property (nonatomic) PassThroughGridView *grid;
 @property (nonatomic) NSTextField *titleTextField;
 @property (nonatomic) NSTextField *locationTextField;
 @property (nonatomic) NSTextField *durationTextField;
 @property (nonatomic) MoButton *btnVideo;
+@property (nonatomic) NSButton *btnEvent;
 @property (nonatomic, weak) EventInfo *eventInfo;
 @property (nonatomic) BOOL dim;
+@property (nonatomic) NSLayoutConstraint *gridTrailingConstraint;
 @end
 
 @interface AgendaPopoverVC : OpaquePopoverViewController
@@ -70,9 +75,6 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
     // Calendars table view
     _tv = [MoTableView new];
-    _tv.target = self;
-    _tv.action = @selector(showPopover:);
-    _tv.doubleAction = @selector(showCalendarApp:);
     _tv.menu = [NSMenu new];
     _tv.menu.delegate = self;
     _tv.headerView = nil;
@@ -229,7 +231,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
 - (void)showPopover:(id)sender
 {
-    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
+	if (![[sender superview] isKindOfClass:[AgendaEventCell class]]) return;
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -239,7 +241,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         self->_popover.animates = NO;
     });
     
-    AgendaEventCell *cell = [_tv viewAtColumn:0 row:_tv.clickedRow makeIfNecessary:NO];
+	AgendaEventCell *cell = (AgendaEventCell *)[sender superview];
     
     if (!cell) return; // should never happen
     
@@ -248,7 +250,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     [popoverVC populateWithEventInfo:cell.eventInfo];
     
     if (cell.eventInfo.event.calendar.allowsContentModifications) {
-        popoverVC.btnDelete.tag = _tv.clickedRow;
+        popoverVC.btnDelete.tag = [_tv rowForView:cell];
         popoverVC.btnDelete.target = self;
         popoverVC.btnDelete.action = @selector(deleteEvent:);
         unichar backspaceKey = NSBackspaceCharacter;
@@ -259,7 +261,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 	popoverVC.btnShowCalApp.target = self;
 	popoverVC.btnShowCalApp.action = @selector(showCalendarApp:);
     
-    NSRect positionRect = NSInsetRect([_tv rectOfRow:_tv.clickedRow], 8, 0);
+    NSRect positionRect = NSInsetRect([_tv rectOfRow:[_tv rowForView:cell]], 8, 0);
     [_popover setAppearance:NSApp.effectiveAppearance];
     [_popover showRelativeToRect:positionRect ofView:_tv preferredEdge:NSRectEdgeMinX];
     [_popover setContentSize:popoverVC.size];
@@ -515,6 +517,11 @@ static NSString *kEventCellIdentifier = @"EventCell";
             }
         }
     }
+	
+	// Update event button.
+	cell.btnEvent.target = self;
+	cell.btnEvent.action = @selector(showPopover:);
+	cell.gridTrailingConstraint.constant = info.zoomURL ? -30 : -11;
 
     // Virtual meeting button.
     cell.btnVideo.enabled = NO;
@@ -606,6 +613,20 @@ static NSString *kEventCellIdentifier = @"EventCell";
     NSRectFill(slotRect);
 }
 
+@end
+
+#pragma mark -
+#pragma mark PassThroughGridView
+
+// =========================================================================
+// PassThroughGridView
+// =========================================================================
+
+@implementation PassThroughGridView
+- (NSView *)hitTest:(NSPoint)point
+{
+	return nil;
+}
 @end
 
 #pragma mark -
@@ -709,17 +730,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     self = [super init];
     if (self) {
         self.identifier = kEventCellIdentifier;
-        _titleTextField = label();
-        _titleTextField.maximumNumberOfLines = 1;
-        _locationTextField = label();
-        _locationTextField.maximumNumberOfLines = 2;
-        _durationTextField = label();
-        
-        _btnVideo = [MoButton new];
-        _btnVideo.bordered = 0;
-        _btnVideo.image = [NSImage imageNamed:SizePref.videoImageName];
-        _btnVideo.image.template = YES;
-        
+
         /*
          Outer box = self
          Middle box = grid
@@ -741,27 +752,46 @@ static NSString *kEventCellIdentifier = @"EventCell";
          |     |                                    |
          +------------------------------------------+
          */
+		
+		// This button handles opening the update event popover, but is positioned
+		// below the video button so that it is still clickable.
+		_btnEvent = [NSButton new];
+		_btnEvent.title = @"";
+		_btnEvent.bordered = 0;
+		_btnEvent.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+		[self addSubview:_btnEvent];
+		
+		_titleTextField = label();
+		_titleTextField.maximumNumberOfLines = 1;
+		_locationTextField = label();
+		_locationTextField.maximumNumberOfLines = 2;
+		_durationTextField = label();
         
-        NSGridView *durationGrid = [NSGridView gridViewWithViews:@[@[_durationTextField, _btnVideo]]];
-        durationGrid.rowSpacing = 0;
-        [durationGrid setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
-        
-        _grid = [NSGridView gridViewWithViews:@[@[_titleTextField],
+        _grid = [PassThroughGridView gridViewWithViews:@[@[_titleTextField],
                                                 @[_locationTextField],
-                                                @[durationGrid]]];
+                                                @[_durationTextField]]];
         _grid.translatesAutoresizingMaskIntoConstraints = NO;
         _grid.rowSpacing = 0;
         [self addSubview:_grid];
         
         MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:self metrics:nil views:NSDictionaryOfVariableBindings(_grid)];
-        [vfl :@"H:[_grid]-11-|"];
         [vfl :@"V:|-3-[_grid]-3-|"];
         
         CGFloat leadingConstant = SizePref.agendaEventLeadingMargin;
         _gridLeadingConstraint = [_grid.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:leadingConstant];
         _gridLeadingConstraint.active = YES;
+		
+		_gridTrailingConstraint = [_grid.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11];
+		_gridTrailingConstraint.active = YES;
         
-        [_btnVideo.centerYAnchor constraintEqualToAnchor:_durationTextField.centerYAnchor].active = YES;
+		_btnVideo = [MoButton new];
+		_btnVideo.bordered = 0;
+		_btnVideo.image = [NSImage imageNamed:SizePref.videoImageName];
+		_btnVideo.image.template = YES;
+		_btnVideo.translatesAutoresizingMaskIntoConstraints = NO;
+		[self addSubview:_btnVideo];
+		[_btnVideo.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+		[_btnVideo.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11].active = YES;
         
         REGISTER_FOR_SIZE_CHANGE;
     }
