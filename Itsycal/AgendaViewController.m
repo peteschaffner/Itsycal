@@ -172,7 +172,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // Show a context menu ONLY for non-group rows.
     [menu removeAllItems];
     if (_tv.clickedRow < 0 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
-    [menu addItemWithTitle:NSLocalizedString(@"Open Calendar", nil) action:@selector(showCalendarApp:) keyEquivalent:@""];
+    [menu addItemWithTitle:NSLocalizedString(@"Open in Calendar", nil) action:@selector(showCalendarApp:) keyEquivalent:@""];
     [menu addItemWithTitle:NSLocalizedString(@"Copy", nil) action:@selector(copyEventToPasteboard:) keyEquivalent:@""];
     EventInfo *info = self.events[_tv.clickedRow];
     if (info.event.calendar.allowsContentModifications) {
@@ -280,6 +280,17 @@ static NSString *kEventCellIdentifier = @"EventCell";
 	} else if (_tv.clickedRow != -1 || ![self tableView:_tv isGroupRow:_tv.clickedRow]) {
 		row = _tv.clickedRow;
 	} else return;
+	
+	// Open Calendar.app with the given event selected. This only works for events that aren't repeating
+	// as the "original" is targeted when trying to show those types of events. Need to figure out how
+	// to get the relative, repeating event...
+	EKEvent *event = ((EventInfo *)self.events[row]).event;
+	if (!event.hasRecurrenceRules) {	
+		NSString *eventID = event.eventIdentifier;
+		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"ical://ekevent/%@", eventID]];
+		[NSWorkspace.sharedWorkspace openURL:url];
+		return;
+	}
 
     // Work backwards from the clicked row (which is an EventInfo row)
     // to find the parent NSDate row. We do this instead of just getting
