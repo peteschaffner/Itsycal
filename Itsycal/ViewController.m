@@ -10,6 +10,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "ViewController.h"
 #import "Itsycal.h"
+#import "ItsycalWindow.h"
 #import "SBCalendar.h"
 #import "EventViewController.h"
 #import "PrefsVC.h"
@@ -20,7 +21,6 @@
 #import "MoVFLHelper.h"
 #import "MoUtils.h"
 #import "Sparkle/SUUpdater.h"
-#import "Themer.h"
 
 @implementation ViewController
 {
@@ -43,7 +43,6 @@
     BOOL       _shouldShowMeetingIndicator;
     NSRect     _screenFrame;
     NSPopover *_newEventPopover;
-	NSPopover *_itsycalPopover;
 }
 
 - (void)dealloc
@@ -182,7 +181,7 @@
     _btnPin.state = [defaults boolForKey:kPinItsycal] ? NSControlStateValueOn : NSControlStateValueOff;
     _moCal.showWeeks = [defaults boolForKey:kShowWeeks];
 
-    [self.view.window makeFirstResponder:_moCal];
+    [self.itsycalWindow makeFirstResponder:_moCal];
 }
 
 #pragma mark -
@@ -362,17 +361,7 @@
 - (void)pin:(id)sender
 {
     BOOL pin = _btnPin.state == NSControlStateValueOn;
-	[self updateItsycalPopoverBehavior];
     [[NSUserDefaults standardUserDefaults] setBool:pin forKey:kPinItsycal];
-}
-
-- (void)updateItsycalPopoverBehavior
-{
-	if (_btnPin.state == NSControlStateValueOn) {	
-		[_itsycalPopover setBehavior:NSPopoverBehaviorSemitransient];
-	} else {
-		[_itsycalPopover setBehavior:NSPopoverBehaviorTransient];
-	}
 }
 
 - (NSWindowController *)prefsWC
@@ -461,6 +450,11 @@
     [self clockFormatDidChange];
     [self updateMenubarIcon];
 	[self positionItsycalWindow];
+	
+	
+	// Notification for when status item view moves
+	 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusItemMoved:) name:NSWindowDidMoveNotification object:_statusItem.button.window];
+	 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusItemMoved:) name:NSWindowDidResizeNotification object:_statusItem.button.window];
 }
 
 - (void)updateStatusItemFont
@@ -711,8 +705,47 @@
         }
     }
     _screenFrame = statusItemScreen.frame;
-    
+	CGFloat screenMaxX = NSMaxX(statusItemScreen.frame);
+
+	// Constrain the menu item's frame to be no higher than the top
+	// of the screen. For some reason, when an app is in fullscreen
+	// mode sometimes the menu item frame is reported to be *above*
+	// the top of the screen. The result is that the calendar is
+	// shown clipped at the top. Prevent that by constraining the
+	// top of the menu item to be at most the top of the screen.
+	statusItemFrame.origin.y = MIN(statusItemFrame.origin.y, NSMaxY(statusItemScreen.frame));
+	
+	// So that agenda height can adjust to fit screen if needed.
     [_agendaVC.view setNeedsLayout:YES];
+	
+	[self.itsycalWindow positionRelativeToRect:statusItemFrame screenMaxX:screenMaxX];
+}
+
+- (void)statusItemMoved:(NSNotification *)note
+{
+	// Reposition itsycalWindow so that it remains
+	// centered under _statusItemView.
+	//
+	// We do the repositioning after a slight delay to account
+	// for the following scenario:
+	//  - The user has more than one screen.
+	//  - Itsycal is visible on one of them.
+	//  - The user clicks the menu item on the other screen.
+	//
+	// In this scenario, this method will be called because the
+	// user's click "moved" the status item window from one screen
+	// to another. If we repositioned the window immediately, it
+	// would be placed on the active screen and the logic in
+	// -statusItemClicked: would not be able to know that the click
+	// occurred in a different screen from the one where Itsycal
+	// was showing. The result would be Itsycal flashing in the
+	// new screen (because of this method's repositioning) and then
+	// hiding because that's the logic that would execute in the
+	// -statusItemClicked: method. The delay let's -menuItemClicked:
+	// handle this scenario first.
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		[self positionItsycalWindow];
+	});
 }
 
 - (void)statusItemClicked:(id)sender
@@ -724,50 +757,58 @@
     // To distinguish screens, we used to use the screen address,
     // but with macOS Big Sur, that is not reliable. Instead,
     // we now use the screen's frame.
-//    if (!NSEqualRects(self.itsycalWindow.screen.frame, NSScreen.mainScreen.frame)) {
-//        if ([self.itsycalWindow occlusionState] & NSWindowOcclusionStateVisible) {
-//            // The slight delay before showing the window in the new
-//            // position is to allow -windowDidResignKey: to execute
-//            // first so that it doesn't hide the window we are
-//            // trying to show.
-//            [self.itsycalWindow orderOut:nil];
-//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//                [self showItsycalWindow];
-//            });
-//            return;
-//        }
-//    }
-//    if ([self.itsycalWindow occlusionState] & NSWindowOcclusionStateVisible) {
-//        [self hideItsycalWindow];
-//    }
-//    else {
-//        [self showItsycalWindow];
-//    }
-	if (_itsycalPopover.isShown) {
-		[_itsycalPopover close];
-	} else {
-		[self showItsycalWindow];
-	}
+    if (!NSEqualRects(self.itsycalWindow.screen.frame, NSScreen.mainScreen.frame)) {
+        if ([self.itsycalWindow occlusionState] & NSWindowOcclusionStateVisible) {
+            // The slight delay before showing the window in the new
+            // position is to allow -windowDidResignKey: to execute
+            // first so that it doesn't hide the window we are
+            // trying to show.
+            [self.itsycalWindow orderOut:nil];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self showItsycalWindow];
+            });
+            return;
+        }
+    }
+    if ([self.itsycalWindow occlusionState] & NSWindowOcclusionStateVisible) {
+        [self hideItsycalWindow];
+    }
+    else {
+        [self showItsycalWindow];
+    }
 }
 
 #pragma mark -
 #pragma mark Window management
 
+- (ItsycalWindow *)itsycalWindow
+{
+	return (ItsycalWindow *)self.view.window;
+}
+
 - (void)showItsycalWindow
 {
     [[NSApplication sharedApplication] unhideWithoutActivation];
 	[self positionItsycalWindow];
-	if (!_itsycalPopover) {
-		_itsycalPopover = [NSPopover new];
-		_itsycalPopover.animates = NO;
-		_itsycalPopover.delegate = self;
-		_itsycalPopover.contentViewController = self;
-	}
-	[_itsycalPopover showRelativeToRect:_statusItem.button.frame ofView:_statusItem.button preferredEdge:NSRectEdgeMinY];
-	[self updateItsycalPopoverBehavior];
-	[self.view.window makeKeyAndOrderFront:self];
-	[self.view.window makeFirstResponder:_moCal];
+	[self.itsycalWindow makeKeyAndOrderFront:self];
+	[self.itsycalWindow makeFirstResponder:_moCal];
+	[_statusItem.button setHighlighted:YES];
     _inactiveTime = 0;
+}
+
+- (void)hideItsycalWindow
+{
+	[self.itsycalWindow orderOut:self];
+	[_newEventPopover close];
+	[_statusItem.button highlight:NO];
+	[self resetCalendarToToday];
+	_inactiveTime = MonotonicClockTime();
+}
+
+- (void)cancel:(id)sender
+{
+	// User pressed 'esc'.
+	[self hideItsycalWindow];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
@@ -775,20 +816,18 @@
     [self positionItsycalWindow];
 }
 
+- (void)windowDidResignKey:(NSNotification *)notification
+{
+	if (_btnPin.state == NSControlStateValueOff) {
+		[self hideItsycalWindow];
+	}
+}
+
 - (void)popoverDidClose:(NSNotification *)notification
 {
-    if (notification.object == _newEventPopover) {
-        _newEventPopover = nil;
-    }
-	
-	if (notification.object == _itsycalPopover) {
-		[self.view.window orderOut:self];
-		_inactiveTime = MonotonicClockTime();
-		_itsycalPopover = nil;
+	if (notification.object == _newEventPopover) {
+		_newEventPopover = nil;
 	}
-	
-	// Reset calendar position so when reopening you see today's agenda
-	[_moCal showTodayMonth:self];
 }
 
 - (void)keyboardShortcutActivated
@@ -1287,6 +1326,15 @@
     else if ([keyPath isEqualToString:kClockFormat]) {
         [self clockFormatDidChange];
     }
+}
+
+@end
+
+@implementation NSStatusBarButton (Additions)
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	[(ViewController *)self.target statusItemClicked:self];
 }
 
 @end
