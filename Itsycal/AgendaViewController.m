@@ -363,12 +363,17 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
     }
 	else if ([obj isKindOfClass:SBObject.class]) {
 		Things3ToDo *todo = obj;
+		NSString *title = todo.name;
 		AgendaTodoCell *cell = [_tv makeViewWithIdentifier:kTodoCellIdentifier owner:self];
 		if (cell == nil) cell = [AgendaTodoCell new];
-		cell.title.stringValue = todo.name;
-		cell.btnEvent.target = self;
-		cell.btnEvent.action = @selector(showThingsApp:);
-		cell.btnEvent.tag = row;
+		
+		if (title) {		
+			cell.title.stringValue = todo.name;
+			cell.btnEvent.target = self;
+			cell.btnEvent.action = @selector(showThingsApp:);
+			cell.btnEvent.tag = row;
+		}
+		
 		v = cell;
 	}
 	else {
