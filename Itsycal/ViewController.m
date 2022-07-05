@@ -12,6 +12,7 @@
 #import "Itsycal.h"
 #import "ItsycalWindow.h"
 #import "SBCalendar.h"
+#import "Things3.h"
 #import "EventViewController.h"
 #import "PrefsVC.h"
 #import "PrefsGeneralVC.h"
@@ -788,6 +789,9 @@
 
 - (void)showItsycalWindow
 {
+	dispatch_async(dispatch_get_main_queue(), ^{	
+		[self updateAgenda];
+	});
     [[NSApplication sharedApplication] unhideWithoutActivation];
 	[self positionItsycalWindow];
 	[self.itsycalWindow makeKeyAndOrderFront:self];
@@ -845,7 +849,7 @@
     if (row == -1) {
         [_moCal unhighlightCells];
     }
-    else {
+    else if([_agendaVC.events[row] isKindOfClass:EventInfo.class]) {
         EventInfo *info = _agendaVC.events[row];
         MoDate startDate = MakeDateWithNSDate(info.event.startDate, _nsCal);
         MoDate endDate   = MakeDateWithNSDate(info.event.endDate,   _nsCal);
@@ -976,14 +980,24 @@
 
 - (NSArray *)datesAndEventsForDate:(MoDate)date days:(NSInteger)days
 {
+	Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
+	Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
     NSMutableArray *datesAndEvents = [NSMutableArray new];
     MoDate endDate = AddDaysToDate(days, date);
     while (CompareDates(date, endDate) < 0) {
         NSDate *nsDate = MakeNSDateWithDate(date, _nsCal);
         NSArray *events = _filteredEventsForDate[nsDate];
         if (events != nil) {
-            [datesAndEvents addObject:nsDate];
-            [datesAndEvents addObjectsFromArray:events];
+			[datesAndEvents addObject:nsDate];
+			[datesAndEvents addObjectsFromArray:events];
+			
+			// Add today's todos from Things.app
+			if (CompareDates(date, [self todayDate]) == 0) {
+				for (Things3ToDo *todo in todayList.toDos) {
+					if (todo.status != Things3StatusOpen) continue;
+					[datesAndEvents addObject:todo];
+				}
+			}
         }
         date = AddDaysToDate(1, date);
     }
