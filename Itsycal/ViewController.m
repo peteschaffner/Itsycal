@@ -980,8 +980,6 @@
 
 - (NSArray *)datesAndEventsForDate:(MoDate)date days:(NSInteger)days
 {
-	Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
-	Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
     NSMutableArray *datesAndEvents = [NSMutableArray new];
     MoDate endDate = AddDaysToDate(days, date);
     while (CompareDates(date, endDate) < 0) {
@@ -993,10 +991,11 @@
 			
 			// Add today's todos from Things.app
 			if (CompareDates(date, [self todayDate]) == 0) {
-				for (Things3ToDo *todo in todayList.toDos) {
-					if (todo.status != Things3StatusOpen) continue;
-					[datesAndEvents addObject:todo];
-				}
+				Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
+				Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
+				NSArray *todos = [todayList.toDos get];
+				NSArray *openTodos = [todos filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"status == %d", Things3StatusOpen]];
+				[datesAndEvents addObjectsFromArray:openTodos];
 			}
         }
         date = AddDaysToDate(1, date);

@@ -367,7 +367,7 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
 		AgendaTodoCell *cell = [_tv makeViewWithIdentifier:kTodoCellIdentifier owner:self];
 		if (cell == nil) cell = [AgendaTodoCell new];
 		
-		if (title) {		
+		if (title) {
 			cell.title.stringValue = todo.name;
 			cell.btnEvent.target = self;
 			cell.btnEvent.action = @selector(showThingsApp:);
@@ -777,8 +777,7 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
 		[_title.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11].active = YES;
 		[_title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
 		
-		// This button handles opening the update event popover, but is positioned
-		// below the video button so that it is still clickable.
+		// This button handles opening the todo popover.
 		_btnEvent = [NSButton new];
 		_btnEvent.title = @"";
 		_btnEvent.bordered = 0;
