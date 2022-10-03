@@ -281,34 +281,37 @@ static NSString *kEventCellIdentifier = @"EventCell";
 		row = _tv.clickedRow;
 	} else return;
 	
-	// Open Calendar.app with the given event selected. This only works for events that aren't repeating
-	// as the "original" is targeted when trying to show those types of events. Need to figure out how
-	// to get the relative, repeating event...
+	// Open Calendar.app with the given event selected.
 	EKEvent *event = ((EventInfo *)self.events[row]).event;
-	if (!event.hasRecurrenceRules) {	
-		NSString *eventID = event.eventIdentifier;
-		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"ical://ekevent/%@", eventID]];
-		[NSWorkspace.sharedWorkspace openURL:url];
-		return;
+	NSString *eventID = event.calendarItemIdentifier;
+	NSString *path;
+	if (event.hasRecurrenceRules) {
+		NSDate *safeStartDate = event.startDate ? event.startDate : NSDate.distantFuture;
+		NSLocale *locale;
+		NSTimeZone *timeZone;
+		NSDateFormatter *dateFormatter = [NSDateFormatter new];
+		dateFormatter.dateFormat = @"yyyyMMdd'T'HHmmss'Z'";
+		if (event.isAllDay) {
+			locale = NSLocale.currentLocale;
+			timeZone = NSTimeZone.localTimeZone;
+		} else {
+			locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+			timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+		}
+		dateFormatter.locale = locale;
+		dateFormatter.timeZone = timeZone;
+		NSString *formattedDate = [dateFormatter stringFromDate:safeStartDate];
+		
+		path = [NSString stringWithFormat:@"ical://ekevent/%@/%@?method=show&options=more", formattedDate, eventID];
+	} else {
+		path = [NSString stringWithFormat:@"ical://ekevent/%@?method=show&options=more", eventID];
 	}
-
-    // Work backwards from the clicked row (which is an EventInfo row)
-    // to find the parent NSDate row. We do this instead of just getting
-    // the clicked event's startDate because spanning events might start
-    // on a different date from the one that was clicked.
-    NSDate *clickedDate = nil;
-    while (row > 0) {
-        row = row - 1;
-        id obj = self.events[row];
-        if ([obj isKindOfClass:[NSDate class]]) {
-            clickedDate = obj;
-            break;
-        }
-    }
-    if (!clickedDate) return; // should never happen
-    if (self.delegate && [self.delegate respondsToSelector:@selector(agendaShowCalendarAppAtDate:)]) {
-        [self.delegate agendaShowCalendarAppAtDate:clickedDate];
-    }
+	
+	NSURL *url = [NSURL URLWithString:path];
+	dispatch_async(dispatch_get_global_queue(NSOperationQualityOfServiceUserInitiated, 0), ^{
+		[NSWorkspace.sharedWorkspace openURL:url];
+	});
+	return;
 }
 
 #pragma mark -
