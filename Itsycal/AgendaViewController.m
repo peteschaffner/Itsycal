@@ -1280,10 +1280,18 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
     // URL
     if (info.event.URL) {
-        // HACK: append a space at end of URL to force correct height calc. Without
-        // this, height is sometimes wrong on first display.
-        NSString *absURL = [NSString stringWithFormat:@"%@ ", info.event.URL.absoluteString];
-        [self populateTextView:_URL withString:absURL heightConstraint:_URLHeight];
+		// For some reason we are sometimes getting a false positive here,
+		// where URL is `<object returned empty description>` when printing said object.
+		if (info.event.URL.absoluteString.length == 0) {
+			[_grid rowAtIndex:5].hidden = !info.event.hasNotes;
+			[_grid rowAtIndex:6].hidden = !info.event.hasNotes;
+			[_grid rowAtIndex:7].hidden = YES;
+		} else {			
+			// HACK: append a space at end of URL to force correct height calc. Without
+			// this, height is sometimes wrong on first display.
+			NSString *absURL = [NSString stringWithFormat:@"%@ ", info.event.URL.absoluteString];
+			[self populateTextView:_URL withString:absURL heightConstraint:_URLHeight];
+		}
     }
     
     _title.stringValue = title;
