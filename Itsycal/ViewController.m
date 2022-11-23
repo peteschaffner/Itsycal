@@ -802,11 +802,13 @@
 
 - (void)hideItsycalWindow
 {
-	[self.itsycalWindow orderOut:self];
-	[_newEventPopover close];
-	[_statusItem.button highlight:NO];
-	[self resetCalendarToToday];
-	_inactiveTime = MonotonicClockTime();
+	if (!_newEventPopover.shown) {	
+		[self.itsycalWindow orderOut:self];
+		[_newEventPopover close];
+		[_statusItem.button highlight:NO];
+		[self resetCalendarToToday];
+		_inactiveTime = MonotonicClockTime();
+	}
 }
 
 - (void)cancel:(id)sender
