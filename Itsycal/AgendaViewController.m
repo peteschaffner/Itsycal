@@ -14,12 +14,10 @@
 #import "Themer.h"
 #import "Sizer.h"
 #import "OpaquePopoverViewController.h"
-#import "Things3.h"
 
 static NSString *kColumnIdentifier    = @"Column";
 static NSString *kDateCellIdentifier  = @"DateCell";
 static NSString *kEventCellIdentifier = @"EventCell";
-static NSString *kTodoCellIdentifier = @"TodoCell";
 
 @interface ThemedScroller : NSScroller
 @end
@@ -35,11 +33,6 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
 @property (nonatomic) NSTextField *dayTextField;
 @property (nonatomic) NSTextField *DOWTextField;
 @property (nonatomic, weak) NSDate *date;
-@end
-
-@interface AgendaTodoCell : NSView
-@property (nonatomic) NSTextField *title;
-@property (nonatomic) NSButton *btnEvent;
 @end
 
 @interface AgendaEventCell : NSView
@@ -321,15 +314,6 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
 	return;
 }
 
-- (void)showThingsApp:(id)sender
-{
-	if ([sender isKindOfClass:[NSButton class]]) {
-		NSButton *btn = sender;
-		Things3ToDo *todo = ((Things3ToDo *)self.events[btn.tag]);
-		[todo edit];
-	}
-}
-
 #pragma mark -
 #pragma mark TableView delegate/datasource
 
@@ -364,22 +348,7 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
         cell.DOWTextField.textColor = Theme.agendaDOWTextColor;
         v = cell;
     }
-	else if ([obj isKindOfClass:SBObject.class]) {
-		Things3ToDo *todo = obj;
-		NSString *title = todo.name;
-		AgendaTodoCell *cell = [_tv makeViewWithIdentifier:kTodoCellIdentifier owner:self];
-		if (cell == nil) cell = [AgendaTodoCell new];
-		
-		if (title) {
-			cell.title.stringValue = todo.name;
-			cell.btnEvent.target = self;
-			cell.btnEvent.action = @selector(showThingsApp:);
-			cell.btnEvent.tag = row;
-		}
-		
-		v = cell;
-	}
-	else {
+    else {
         EventInfo *info = obj;
         AgendaEventCell *cell = [_tv makeViewWithIdentifier:kEventCellIdentifier owner:self];
         if (!cell) cell = [AgendaEventCell new];
@@ -750,68 +719,6 @@ static NSString *kTodoCellIdentifier = @"TodoCell";
     NSRect r = NSMakeRect(10, self.bounds.size.height - 4, self.bounds.size.width - 20, 1);
     [Theme.agendaDividerColor set];
     NSRectFillUsingOperation(r, NSCompositingOperationSourceOver);
-}
-
-@end
-
-
-@implementation AgendaTodoCell {
-	NSLayoutConstraint *_leadingConstraint;
-}
-
-- (instancetype)init
-{
-	self = [super init];
-	if (self) {
-		self.identifier = kTodoCellIdentifier;
-		
-		_title = [NSTextField labelWithString:@""];
-		_title.translatesAutoresizingMaskIntoConstraints = NO;
-		_title.font = [NSFont systemFontOfSize:SizePref.fontSize];
-		_title.lineBreakMode = NSLineBreakByWordWrapping;
-		_title.cell.truncatesLastVisibleLine = YES;
-		_title.maximumNumberOfLines = 1;
-
-		[self addSubview:_title];
-		
-		CGFloat leadingConstant = SizePref.agendaEventLeadingMargin;
-		_leadingConstraint = [_title.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:leadingConstant];
-		_leadingConstraint.active = YES;
-		[_title.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11].active = YES;
-		[_title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-		
-		// This button handles opening the todo popover.
-		_btnEvent = [NSButton new];
-		_btnEvent.title = @"";
-		_btnEvent.bordered = 0;
-		_btnEvent.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-		[self addSubview:_btnEvent];
-		
-		REGISTER_FOR_SIZE_CHANGE;
-	}
-	return self;
-}
-
-- (void)sizeChanged:(id)sender
-{
-	_leadingConstraint.constant = SizePref.agendaEventLeadingMargin;
-	_title.font = [NSFont systemFontOfSize:SizePref.fontSize];
-}
-
-- (void)drawRect:(NSRect)dirtyRect
-{
-	// Draw colored dot. Dot is elongated for all-day events.
-	// Stroke for tentative and pending events, otherwise fill.
-	CGFloat x = 10.75;
-	CGFloat yOffset = SizePref.fontSize + 2.75;
-	CGFloat dotWidthX = SizePref.agendaDotWidth + 0.5;
-	CGFloat dotWidthY = dotWidthX;
-	CGFloat radius = 1.5;
-	NSColor *dotColor = [NSColor colorWithRed:0.424 green:0.604 blue:0.933 alpha:1.0];
-	[dotColor set];
-	NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(x, NSHeight(self.bounds) - yOffset, dotWidthX, dotWidthY) xRadius:radius yRadius:radius];
-	p.lineWidth = 1.4;
-		[p stroke];
 }
 
 @end
