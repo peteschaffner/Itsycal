@@ -28,12 +28,10 @@
     MoCalendar    *_moCal;
     NSCalendar    *_nsCal;
     NSStatusItem  *_statusItem;
-	NSStatusItem  *_currentTaskStatusItem;
     MoButton      *_btnAdd, *_btnCal, *_btnOpt, *_btnPin;
     NSWindowController    *_prefsWC;
     AgendaViewController  *_agendaVC;
     NSDateFormatter       *_iconDateFormatter;
-	NSDateComponentsFormatter *_currentTaskDateFormatter;
     NSTimeInterval         _inactiveTime;
     NSDictionary          *_filteredEventsForDate;
     NSTimer   *_timer;
@@ -119,11 +117,6 @@
 {
     // The order of the statements is important! Subsequent statments
     // depend on previous ones.
-	
-	_currentTaskDateFormatter = [NSDateComponentsFormatter new];
-	_currentTaskDateFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
-	_currentTaskDateFormatter.maximumUnitCount = 2;
-	_currentTaskDateFormatter.allowedUnits = NSCalendarUnitHour | NSCalendarUnitMinute;
     
     _iconDateFormatter = [NSDateFormatter new];
     _iconDateFormatter.formattingContext = NSFormattingContextStandalone;
@@ -439,14 +432,9 @@
     [_statusItem.button sendActionOn:NSEventMaskLeftMouseDown];
     [(NSButtonCell *)_statusItem.button.cell setHighlightsBy:NSNoCellMask];
 
-	_currentTaskStatusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-	_currentTaskStatusItem.button.image = nil;
-	_currentTaskStatusItem.button.imagePosition = NSNoImage;
-	
-	// Remember item position in menubar. (@pskowronek (Github))
-	[_statusItem setAutosaveName:@"ItsycalStatusItem"];
-	[_currentTaskStatusItem setAutosaveName:@"ItsycalCurrentTaskStatusItem"];
-	
+    // Remember item position in menubar. (@pskowronek (Github))
+    [_statusItem setAutosaveName:@"ItsycalStatusItem"];
+
     [self clockFormatDidChange];
     [self updateMenubarIcon];
 	[self positionItsycalWindow];
@@ -1114,13 +1102,13 @@
     }
 
     // Set up _timer to fire on next minute or second.
-//    if (_clockUsesSeconds) {
+    if (_clockUsesSeconds) {
         components.second += 1;
-//    }
-//    else {
-//        components.minute += 1;
-//        components.second = 0;
-//    }
+    }
+    else {
+        components.minute += 1;
+        components.second = 0;
+    }
     NSDate *fireDate = [_nsCal dateFromComponents:components];
     // Set new fireDate a quarter second late in the hope that it
     // avoids the edge case when we fall back at the end of Daylight
@@ -1142,46 +1130,6 @@
         dimEventsTime = currentTime;
         [self showMeetingIndicatorIfNecessary];
     }
-	
-	// Check every 3 seconds and set the current task in the menubar
-//	static NSTimeInterval showTaskTime = 0;
-//	elapsedTime = currentTime - showTaskTime;
-//	if (elapsedTime > 3 || fabs(elapsedTime - 3) < 0.5) {
-		NSString *currentTaskText = @"";
-		for (id obj in _agendaVC.events) {
-			if ([obj isKindOfClass:[EventInfo class]]) {
-				EventInfo *info = obj;
-
-				if (info.event
-					&& info.isAllDay == NO
-					&& [info.event.calendar.title isEqual:@"Personal"]) {
-					NSDate *now = NSDate.now;
-					
-					switch ([now compare:info.event.startDate]) {
-						case NSOrderedAscending:
-							// Event is in the future
-							// TODO: check x time into the future to give some heads-up
-							break;
-						case NSOrderedDescending:
-							// Event has begun but not yet ended
-							if ([now compare:info.event.endDate] == NSOrderedAscending) {
-								NSString *remainingTimeString = [_currentTaskDateFormatter stringFromDate:now toDate:[info.event.endDate dateByAddingTimeInterval:60]];
-								// TODO: truncate the title until it fits (i.e. the item isn't hidden)
-								// https://gist.github.com/stigi/1282781
-								
-								currentTaskText = [NSString stringWithFormat:@"%@ · %@ left", info.event.title, remainingTimeString];
-							}
-							break;
-						default: break;
-					}
-				}
-			}
-		}
-		_currentTaskStatusItem.button.title = currentTaskText;
-		[_currentTaskStatusItem setVisible:currentTaskText.length > 0];
-//		showTaskTime = currentTime;
-//	}
-	
     // Reset calendar to today after 10 minutes of inactivity.
     elapsedTime = currentTime - _inactiveTime;
     if (_inactiveTime && (elapsedTime > 600 || fabs(elapsedTime - 600) < 0.5)) {
