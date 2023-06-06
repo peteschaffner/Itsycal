@@ -1065,7 +1065,7 @@
     AudioObjectPropertyAddress propertyAddress;
     propertyAddress.mSelector = kAudioHardwarePropertyDefaultOutputDevice;
     propertyAddress.mScope    = kAudioObjectPropertyScopeGlobal;
-    propertyAddress.mElement  = kAudioObjectPropertyElementMaster;
+    propertyAddress.mElement  = kAudioObjectPropertyElementMain;
 
     OSStatus result = AudioObjectGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &dataSize, &deviceID);
 
