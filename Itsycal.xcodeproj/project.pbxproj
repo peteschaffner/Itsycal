@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -46,7 +46,7 @@
 		929223EB1E2D6E0900F1A119 /* HighlightPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 929223EA1E2D6E0800F1A119 /* HighlightPicker.m */; };
 		92B28CCF210BD17500485AE2 /* Sizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 92B28CCE210BD17500485AE2 /* Sizer.m */; };
 		92CDDE7B1A955D7F00D7675C /* AgendaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */; };
-		C1177865286F1DF0005732F8 /* ItsycalWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C1177864286F1DF0005732F8 /* ItsycalWindow.m */; };
+		C159A41A2AFB9D640001087D /* ItsycalWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C1177864286F1DF0005732F8 /* ItsycalWindow.m */; };
 		C1CF1205280AEC5D0046B232 /* OpaquePopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1CF1204280AEC5D0046B232 /* OpaquePopoverViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -159,7 +159,6 @@
 		92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgendaViewController.m; sourceTree = "<group>"; };
 		C1177863286F1DF0005732F8 /* ItsycalWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItsycalWindow.h; sourceTree = "<group>"; };
 		C1177864286F1DF0005732F8 /* ItsycalWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItsycalWindow.m; sourceTree = "<group>"; };
-		C1383F8828717F1800A79492 /* Things3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Things3.h; sourceTree = "<group>"; };
 		C1CF1203280AEC5D0046B232 /* OpaquePopoverViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpaquePopoverViewController.h; sourceTree = "<group>"; };
 		C1CF1204280AEC5D0046B232 /* OpaquePopoverViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpaquePopoverViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -231,7 +230,6 @@
 				921181C622E0192A00591FDA /* Colors.xcassets */,
 				9242A5681A82A136005AA4B3 /* MainMenu.xib */,
 				922B6B911A856A7D00DEA9CD /* SBCalendar.h */,
-				C1383F8828717F1800A79492 /* Things3.h */,
 				9242A5611A82A136005AA4B3 /* AppDelegate.h */,
 				9242A5621A82A136005AA4B3 /* AppDelegate.m */,
 				C1177863286F1DF0005732F8 /* ItsycalWindow.h */,
@@ -325,7 +323,6 @@
 				9242A55A1A82A136005AA4B3 /* Resources */,
 				9252DF361AFD3557007B079F /* CopyFiles */,
 				9291F8AB2AE2126B00E80F14 /* CopyFiles */,
-				921949F4225D287F00223258 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -348,7 +345,6 @@
 				TargetAttributes = {
 					9242A55B1A82A136005AA4B3 = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 454HACSRHZ;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
@@ -402,6 +398,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C159A41A2AFB9D640001087D /* ItsycalWindow.m in Sources */,
 				920D6D51266A83AC00498E19 /* MoLoginItem.m in Sources */,
 				9242A5921A82A40B005AA4B3 /* MoCalGrid.m in Sources */,
 				92658E621A9DBD8E002AE86C /* EventViewController.m in Sources */,
@@ -413,7 +410,6 @@
 				9278CADB1A990462004B6BB9 /* MoTableView.m in Sources */,
 				929223EB1E2D6E0900F1A119 /* HighlightPicker.m in Sources */,
 				925B47181A93B63100E0329A /* MoCalToolTipWC.m in Sources */,
-				9242A5871A82A1A1005AA4B3 /* ItsycalWindow.m in Sources */,
 				923E63512AB7FAD7007935A7 /* IconIsConfigurableTransformer.m in Sources */,
 				92CDDE7B1A955D7F00D7675C /* AgendaViewController.m in Sources */,
 				9261EB301EEF447500DCFFC4 /* Themer.m in Sources */,
@@ -594,7 +590,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2262;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 454HACSRHZ;
+				DEVELOPMENT_TEAM = DUX7L2H5WN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -625,7 +621,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 2262;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 454HACSRHZ;
+				DEVELOPMENT_TEAM = DUX7L2H5WN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
