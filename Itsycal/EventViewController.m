@@ -84,6 +84,7 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
             txt.bezeled = NO;
             txt.focusRingType = NSFocusRingTypeNone;
             txt.drawsBackground = NO;
+            txt.textColor = NSColor.textColor;
         }
         else {
             txt = [NSTextField labelWithString:stringValue];
@@ -211,7 +212,7 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
     _notes = [[HackyTextView alloc] initWithFrame:NSMakeRect(0, 0, noteContentSize.width, noteContentSize.height)];
     _notes.delegate = self;
     _notes.font = _location.font; // _title.font is too big
-    _notes.placeholderAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add Notes", @"") attributes:@{NSFontAttributeName: _notes.font, NSForegroundColorAttributeName: NSColor.secondaryLabelColor}];
+    _notes.placeholderAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add Notes", @"") attributes:@{NSFontAttributeName: _notes.font, NSForegroundColorAttributeName: [NSColor colorNamed:@"TextViewPlaceholderColor"]}];
     _notes.allowsUndo = YES;
     _notes.drawsBackground = NO;
     _notes.richText = NO;
