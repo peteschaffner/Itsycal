@@ -98,7 +98,6 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
     NSDatePicker* (^picker)(void) = ^NSDatePicker* () {
         NSDatePicker *picker = [NSDatePicker new];
         picker.datePickerStyle = NSDatePickerStyleTextField;
-		picker.presentsCalendarOverlay = YES;
         picker.locale = NSLocale.currentLocale;
         picker.bezeled  = NO;
         picker.bordered = NO;
