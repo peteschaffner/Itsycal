@@ -44,7 +44,6 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @property (nonatomic) NSButton *btnEvent;
 @property (nonatomic, weak) EventInfo *eventInfo;
 @property (nonatomic) BOOL dim;
-@property (nonatomic) NSLayoutConstraint *gridTrailingConstraint;
 @end
 
 @interface AgendaPopoverVC : OpaquePopoverViewController
@@ -91,7 +90,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     }
 #endif
     [_tv addTableColumn:[[NSTableColumn alloc] initWithIdentifier:kColumnIdentifier]];
-    
+
     // Calendars enclosing scrollview
     NSScrollView *tvContainer = [NSScrollView new];
     tvContainer.translatesAutoresizingMaskIntoConstraints = NO;
@@ -99,11 +98,11 @@ static NSString *kEventCellIdentifier = @"EventCell";
     tvContainer.hasVerticalScroller = YES;
     tvContainer.documentView = _tv;
     tvContainer.verticalScroller = [ThemedScroller new];
-    
+
     [v addSubview:tvContainer];
     [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tv]|" options:0 metrics:nil views:@{@"tv": tvContainer}]];
     [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tv]|" options:0 metrics:nil views:@{@"tv": tvContainer}]];
-    
+
     self.view = v;
 }
 
@@ -192,21 +191,21 @@ static NSString *kEventCellIdentifier = @"EventCell";
         intervalFormatter = [NSDateIntervalFormatter new];
         intervalFormatter.dateStyle = NSDateIntervalFormatterMediumStyle;
     }
-    
+
     AgendaEventCell *cell = [_tv viewAtColumn:0 row:_tv.clickedRow makeIfNecessary:NO];
-    
+
     if (cell == nil) return; // should not happen
-    
+
     intervalFormatter.timeZone  = [NSTimeZone localTimeZone];
     // All-day events don't show time.
     intervalFormatter.timeStyle = cell.eventInfo.event.isAllDay
-        ? NSDateIntervalFormatterNoStyle
-        : NSDateIntervalFormatterShortStyle;
+    ? NSDateIntervalFormatterNoStyle
+    : NSDateIntervalFormatterShortStyle;
     // All-day events technically end at the start of the day after
     // their end date. So display endDate as one less.
     NSDate *endDate = cell.eventInfo.event.isAllDay
-        ? [self.nsCal dateByAddingUnit:NSCalendarUnitDay value:-1 toDate:cell.eventInfo.event.endDate options:0]
-        : cell.eventInfo.event.endDate;
+    ? [self.nsCal dateByAddingUnit:NSCalendarUnitDay value:-1 toDate:cell.eventInfo.event.endDate options:0]
+    : cell.eventInfo.event.endDate;
     // Interval formatter just prints single date when from == to.
     NSString *duration = [intervalFormatter stringFromDate:cell.eventInfo.event.startDate toDate:endDate];
     // If the locale is English and we are in 12 hour time,
@@ -244,11 +243,11 @@ static NSString *kEventCellIdentifier = @"EventCell";
 	AgendaEventCell *cell = (AgendaEventCell *)[sender superview];
     
     if (!cell) return; // should never happen
-    
+
     AgendaPopoverVC *popoverVC = (AgendaPopoverVC *)_popover.contentViewController;
     [popoverVC setNsCal:self.nsCal];
     [popoverVC populateWithEventInfo:cell.eventInfo];
-    
+
     if (cell.eventInfo.event.calendar.allowsContentModifications) {
         popoverVC.btnDelete.tag = [_tv rowForView:cell];
         popoverVC.btnDelete.target = self;
@@ -266,7 +265,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     [_popover showRelativeToRect:positionRect ofView:_tv preferredEdge:NSRectEdgeMinX];
     [_popover setContentSize:popoverVC.size];
     [popoverVC scrollToTopAndFlashScrollers];
-    
+
     // Prevent popoverVC's _note from eating key presses (like esc and delete).
     [popoverVC.view.window makeFirstResponder:popoverVC.btnDelete];
 }
@@ -337,7 +336,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 {
     NSView *v = nil;
     id obj = self.events[row];
-    
+
     if ([obj isKindOfClass:[NSDate class]]) {
         AgendaDateCell *cell = [_tv makeViewWithIdentifier:kDateCellIdentifier owner:self];
         if (cell == nil) cell = [AgendaDateCell new];
@@ -363,7 +362,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // Keep a cell around for measuring event cell height.
     static AgendaDateCell *dateCell = nil;
     static AgendaEventCell *eventCell = nil;
-    
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         eventCell = [AgendaEventCell new];
@@ -371,7 +370,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         dateCell.frame = NSMakeRect(0, 0, NSWidth(self->_tv.frame), 999); // only width is important here
         dateCell.dayTextField.integerValue = 21;
     });
-    
+
     CGFloat height = dateCell.fittingSize.height;
     id obj = self.events[row];
     if ([obj isKindOfClass:[EventInfo class]]) {
@@ -488,7 +487,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     intervalFormatter.timeZone  = [NSTimeZone localTimeZone];
     // Needed to pick up 12/24 hr time system preference change:
     intervalFormatter.locale = [NSLocale currentLocale];
-    
+
     cell.eventInfo = info;
 
     if (info && info.event) {
@@ -499,13 +498,13 @@ static NSString *kEventCellIdentifier = @"EventCell";
         }
         if (info.event.location) location = info.event.location;
     }
-    
+
     // Hide location row IF !self.showLocation OR there's no location string.
     [cell.grid rowAtIndex:1].hidden = (!self.showLocation || location.length == 0);
-    
+
     // Hide duration row for all day events.
     [cell.grid rowAtIndex:2].hidden = info.isAllDay;
-    
+
     if (info.isAllDay == NO) {
         if (info.isStartDate == YES) {
             if (info.event.startDate != nil) {
@@ -535,7 +534,6 @@ static NSString *kEventCellIdentifier = @"EventCell";
 	// Update event button.
 	cell.btnEvent.target = self;
 	cell.btnEvent.action = @selector(showPopover:);
-	cell.gridTrailingConstraint.constant = info.zoomURL ? -30 : -11;
 
     // Virtual meeting button.
     cell.btnVideo.enabled = NO;
@@ -558,7 +556,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         cell.titleTextField.textColor = Theme.agendaEventDateTextColor;
         cell.dim = YES;
     }
-    
+
     // Enable the zoom button 15 minutes prior to event start until end.
     // If the user prefers, button can remain enabled indefinitely.
     NSDate *fifteenMinutesPrior = [self.nsCal dateByAddingUnit:NSCalendarUnitSecond value:-(15 * 60 + 30) toDate:info.event.startDate options:0];
@@ -688,7 +686,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         _dayTextField.font = [NSFont systemFontOfSize:SizePref.fontSize weight:NSFontWeightSemibold];
         _dayTextField.textColor = Theme.agendaDayTextColor;
         [_dayTextField setContentHuggingPriority:NSLayoutPriorityDefaultHigh forOrientation:NSLayoutConstraintOrientationHorizontal];
-        
+
         _DOWTextField = [NSTextField labelWithString:@""];
         _DOWTextField.translatesAutoresizingMaskIntoConstraints = NO;
         _DOWTextField.font = [NSFont systemFontOfSize:SizePref.fontSize weight:NSFontWeightSemibold];
@@ -699,7 +697,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:self metrics:nil views:NSDictionaryOfVariableBindings(_dayTextField, _DOWTextField)];
         [vfl :@"H:|-10-[_DOWTextField]-(>=4)-[_dayTextField]-10-|" :NSLayoutFormatAlignAllLastBaseline];
         [vfl :@"V:|-6-[_dayTextField]-1-|"];
-        
+
         REGISTER_FOR_SIZE_CHANGE;
     }
     return self;
@@ -744,6 +742,24 @@ static NSString *kEventCellIdentifier = @"EventCell";
     self = [super init];
     if (self) {
         self.identifier = kEventCellIdentifier;
+        // This button handles opening the update event popover, but is positioned
+        // below the video button so that it is still clickable.
+        _btnEvent = [NSButton new];
+        _btnEvent.title = @"";
+        _btnEvent.bordered = 0;
+        _btnEvent.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        [self addSubview:_btnEvent];
+
+        _titleTextField = label();
+        _titleTextField.maximumNumberOfLines = 1;
+        _locationTextField = label();
+        _locationTextField.maximumNumberOfLines = 2;
+        _durationTextField = label();
+
+        _btnVideo = [MoButton new];
+        _btnVideo.bordered = 0;
+        _btnVideo.image = [NSImage imageNamed:SizePref.videoImageName];
+        _btnVideo.image.template = YES;
 
         /*
          Outer box = self
@@ -766,47 +782,28 @@ static NSString *kEventCellIdentifier = @"EventCell";
          |     |                                    |
          +------------------------------------------+
          */
-		
-		// This button handles opening the update event popover, but is positioned
-		// below the video button so that it is still clickable.
-		_btnEvent = [NSButton new];
-		_btnEvent.title = @"";
-		_btnEvent.bordered = 0;
-		_btnEvent.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-		[self addSubview:_btnEvent];
-		
-		_titleTextField = label();
-		_titleTextField.maximumNumberOfLines = 1;
-		_locationTextField = label();
-		_locationTextField.maximumNumberOfLines = 2;
-		_durationTextField = label();
-        
+
+        NSGridView *durationGrid = [NSGridView gridViewWithViews:@[@[_durationTextField, _btnVideo]]];
+        durationGrid.rowSpacing = 0;
+        [durationGrid setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+
         _grid = [PassThroughGridView gridViewWithViews:@[@[_titleTextField],
                                                 @[_locationTextField],
-                                                @[_durationTextField]]];
+                                                @[durationGrid]]];
         _grid.translatesAutoresizingMaskIntoConstraints = NO;
         _grid.rowSpacing = 0;
         [self addSubview:_grid];
-        
+
         MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:self metrics:nil views:NSDictionaryOfVariableBindings(_grid)];
+        [vfl :@"H:[_grid]-11-|"];
         [vfl :@"V:|-3-[_grid]-3-|"];
-        
+
         CGFloat leadingConstant = SizePref.agendaEventLeadingMargin;
         _gridLeadingConstraint = [_grid.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:leadingConstant];
         _gridLeadingConstraint.active = YES;
-		
-		_gridTrailingConstraint = [_grid.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11];
-		_gridTrailingConstraint.active = YES;
-        
-		_btnVideo = [MoButton new];
-		_btnVideo.bordered = 0;
-		_btnVideo.image = [NSImage imageNamed:SizePref.videoImageName];
-		_btnVideo.image.template = YES;
-		_btnVideo.translatesAutoresizingMaskIntoConstraints = NO;
-		[self addSubview:_btnVideo];
-		[_btnVideo.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-		[_btnVideo.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11].active = YES;
-        
+
+        [_btnVideo.centerYAnchor constraintEqualToAnchor:_durationTextField.centerYAnchor].active = YES;
+
         REGISTER_FOR_SIZE_CHANGE;
     }
     return self;
@@ -957,11 +954,11 @@ static NSString *kEventCellIdentifier = @"EventCell";
         _title = label();
         _duration = label();
         _recurrence = label();
-        
+
         _location = textview();
         _note = textview();
         _URL = textview();
-        
+
         _btnDelete = [NSButton new];
 		_btnDelete.bordered = NO;
 		_btnDelete.imagePosition = NSImageOnly;
@@ -977,19 +974,19 @@ static NSString *kEventCellIdentifier = @"EventCell";
         NSView *titleHolder = [NSView new];
         [titleHolder addSubview:_title];
         [titleHolder addSubview:_btnDelete];
-		[titleHolder addSubview:_btnShowCalApp];
+        [titleHolder addSubview:_btnShowCalApp];
         MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:titleHolder metrics:nil views:NSDictionaryOfVariableBindings(_title, _btnShowCalApp, _btnDelete)];
         [vfl :@"H:|[_title]-2-[_btnShowCalApp]-(>=10)-[_btnDelete]|" :NSLayoutFormatAlignAllCenterY];
         [vfl :@"V:|[_title]|"];
         [titleHolder.widthAnchor constraintEqualToConstant:POPOVER_TEXT_WIDTH].active = YES;
-        
+
         _attendees = [NSStackView new];
         _attendees.orientation = NSUserInterfaceLayoutOrientationVertical;
         _attendees.alignment = NSLayoutAttributeLeft;
         _attendees.spacing = 4;
         _attendees.detachesHiddenViews = NO;
         [_attendees setClippingResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationVertical];
-        
+
         _grid = [NSGridView gridViewWithViews:@[@[titleHolder],  // row 0
                                                 @[_location],    // 1
                                                 @[separator()],  // 2
@@ -1015,7 +1012,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
         _linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
         _hiddenLinksRegex = [NSRegularExpression regularExpressionWithPattern:@"<((https?|rdar):\\/\\/[^\\s]+)>" options:NSRegularExpressionCaseInsensitive error:NULL];
         _messageLinksRegex = [NSRegularExpression regularExpressionWithPattern:@"message:%3\\S+" options:NSRegularExpressionCaseInsensitive error:NULL];
-        
+
         _locHeight = [_location.heightAnchor constraintEqualToConstant:100];
         _locHeight.active = YES;
         _noteHeight = [_note.heightAnchor constraintEqualToConstant:100];
@@ -1060,17 +1057,17 @@ static NSString *kEventCellIdentifier = @"EventCell";
     NSString *duration = @"";
     NSString *recurrence = @"";
     intervalFormatter.timeZone  = [NSTimeZone localTimeZone];
-    
+
     if (info && info.event) {
         if (info.event.title) title = info.event.title;
     }
-    
+
     // Hide location row IF there's no location string.
     [_grid rowAtIndex:1].hidden = !info.event.location;
-    
+
     // Hide recurrence row IF there's no recurrence rule.
     [_grid rowAtIndex:4].hidden = !info.event.hasRecurrenceRules;
-    
+
     // Hide attendees row and separator above it IF there are no attendees.
     [_grid rowAtIndex:5].hidden = !info.event.hasAttendees;
     [_grid rowAtIndex:6].hidden = !info.event.hasAttendees;
@@ -1078,7 +1075,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // Hide note row and separator row above it IF there's no note AND no URL.
     [_grid rowAtIndex:7].hidden = !info.event.hasNotes && !info.event.URL;
     [_grid rowAtIndex:8].hidden = !info.event.hasNotes;
-    
+
     // Hide URL row IF there's no URL.
     [_grid rowAtIndex:9].hidden = !info.event.URL;
 
@@ -1087,13 +1084,13 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
     // All-day events don't show time.
     intervalFormatter.timeStyle = info.event.isAllDay
-        ? NSDateIntervalFormatterNoStyle
-        : NSDateIntervalFormatterShortStyle;
+    ? NSDateIntervalFormatterNoStyle
+    : NSDateIntervalFormatterShortStyle;
     // All-day events technically end at the start of the day after
     // their end date. So display endDate as one less.
     NSDate *endDate = info.event.isAllDay
-        ? [self.nsCal dateByAddingUnit:NSCalendarUnitDay value:-1 toDate:info.event.endDate options:0]
-        : info.event.endDate;
+    ? [self.nsCal dateByAddingUnit:NSCalendarUnitDay value:-1 toDate:info.event.endDate options:0]
+    : info.event.endDate;
     if (@available(macOS 13.0, *)) {
         // macOS 13 changed All-day events' end date from 12 AM of
         // day after last day of event to 11:59:59 PM of last day.
@@ -1127,23 +1124,23 @@ static NSString *kEventCellIdentifier = @"EventCell";
         switch (rule.frequency) {
             case EKRecurrenceFrequencyDaily:
                 frequency = rule.interval == 1
-                    ? NSLocalizedString(@"Every Day", nil)
-                    : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Days", nil), rule.interval];
+                ? NSLocalizedString(@"Every Day", nil)
+                : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Days", nil), rule.interval];
                 break;
             case EKRecurrenceFrequencyWeekly:
                 frequency = rule.interval == 1
-                    ? NSLocalizedString(@"Every Week", nil)
-                    : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Weeks", nil), rule.interval];
+                ? NSLocalizedString(@"Every Week", nil)
+                : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Weeks", nil), rule.interval];
                 break;
             case EKRecurrenceFrequencyMonthly:
                 frequency = rule.interval == 1
-                    ? NSLocalizedString(@"Every Month", nil)
-                    : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Months", nil), rule.interval];
+                ? NSLocalizedString(@"Every Month", nil)
+                : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Months", nil), rule.interval];
                 break;
             case EKRecurrenceFrequencyYearly:
                 frequency = rule.interval == 1
-                    ? NSLocalizedString(@"Every Year", nil)
-                    : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Years", nil), rule.interval];
+                ? NSLocalizedString(@"Every Year", nil)
+                : [NSString stringWithFormat:NSLocalizedString(@"Every %zd Years", nil), rule.interval];
                 break;
             default:
                 break;
@@ -1161,7 +1158,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
             }
         }
     }
-    
+
     // Location
     if (info.event.location) {
         NSString *trimmedLoc = [info.event.location stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1172,16 +1169,16 @@ static NSString *kEventCellIdentifier = @"EventCell";
             [self populateTextView:_location withString:trimmedLoc heightConstraint:_locHeight];
         }
     }
-    
+
     // Attendees
     if (info.event.hasAttendees) {
-        
+
         // Block returns YES if participant is the event's organizer.
         BOOL (^ParticipantIsOrganizer)(EKParticipant*, EKParticipant*) = ^BOOL(EKParticipant *participant, EKParticipant *organizer) {
             // https://stackoverflow.com/a/17222036/111418
             return [participant.URL.resourceSpecifier isEqualToString:organizer.URL.resourceSpecifier];
         };
-        
+
         // Sometimes info.event.organizer isn't in info.event.attendees.
         // Make an array of participants that definitely has the organizer.
         NSMutableArray<EKParticipant *> *participants = [NSMutableArray new];
@@ -1265,24 +1262,16 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
     // URL
     if (info.event.URL) {
-		// For some reason we are sometimes getting a false positive here,
-		// where URL is `<object returned empty description>` when printing said object.
-		if (info.event.URL.absoluteString.length == 0) {
-			[_grid rowAtIndex:5].hidden = !info.event.hasNotes;
-			[_grid rowAtIndex:6].hidden = !info.event.hasNotes;
-			[_grid rowAtIndex:7].hidden = YES;
-		} else {			
-			// HACK: append a space at end of URL to force correct height calc. Without
-			// this, height is sometimes wrong on first display.
-			NSString *absURL = [NSString stringWithFormat:@"%@ ", info.event.URL.absoluteString];
-			[self populateTextView:_URL withString:absURL heightConstraint:_URLHeight];
-		}
+        // HACK: append a space at end of URL to force correct height calc. Without
+        // this, height is sometimes wrong on first display.
+        NSString *absURL = [NSString stringWithFormat:@"%@ ", info.event.URL.absoluteString];
+        [self populateTextView:_URL withString:absURL heightConstraint:_URLHeight];
     }
-    
+
     _title.stringValue = title;
     _duration.stringValue = duration;
     _recurrence.stringValue = recurrence;
-    
+
     _title.font = [NSFont systemFontOfSize:SizePref.fontSize weight:NSFontWeightSemibold];
     _duration.font = [NSFont systemFontOfSize:SizePref.fontSize];
     _recurrence.font = _duration.font;
@@ -1302,7 +1291,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // we go to match standard URLs, we will only match those whose NSRanges
     // don't intersect (overlap) with message URLs.
     NSMutableArray *messageLinkRanges = [NSMutableArray new];
-    
+
     // Ugly hack to deal with Microsoft's insane habit of putting links
     // in angle brackets, making them invisible when rendereed as HTML.
     string = [_hiddenLinksRegex stringByReplacingMatchesInString:string options:kNilOptions range:NSMakeRange(0, string.length) withTemplate:@"&lt;$1&gt;"];
@@ -1310,7 +1299,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     string = [string stringByReplacingOccurrencesOfString:@"\n" withString:@"<br>"];
     NSData *htmlData = [string dataUsingEncoding:NSUnicodeStringEncoding];
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithHTML:htmlData documentAttributes:nil];
-    
+
     [attrString addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:SizePref.fontSize] range:NSMakeRange(0, attrString.length)];
     [attrString addAttribute:NSForegroundColorAttributeName value:Theme.agendaEventTextColor range:NSMakeRange(0, attrString.length)];
     [_messageLinksRegex enumerateMatchesInString:attrString.string options:kNilOptions range:NSMakeRange(0, attrString.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
