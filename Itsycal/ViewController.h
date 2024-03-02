@@ -17,5 +17,6 @@
 - (void)keyboardShortcutActivated;
 - (void)removeStatusItem;
 - (void)dateURLReceived:(NSDate *)showDate;
+- (void)statusItemClicked:(id)sender;
 
 @end

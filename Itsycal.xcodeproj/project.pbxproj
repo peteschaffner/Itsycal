@@ -49,6 +49,7 @@
 		92B28CCF210BD17500485AE2 /* Sizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 92B28CCE210BD17500485AE2 /* Sizer.m */; };
 		92CDDE7B1A955D7F00D7675C /* AgendaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */; };
 		C17391282B926F3C004FC6BA /* PeteWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C17391272B926F3C004FC6BA /* PeteWindow.m */; };
+		C173912B2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C173912A2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -164,6 +165,8 @@
 		92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgendaViewController.m; sourceTree = "<group>"; };
 		C17391262B926F3C004FC6BA /* PeteWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeteWindow.h; sourceTree = "<group>"; };
 		C17391272B926F3C004FC6BA /* PeteWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PeteWindow.m; sourceTree = "<group>"; };
+		C17391292B93B1C0004FC6BA /* NSStatusBarButton+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSStatusBarButton+Extensions.h"; sourceTree = "<group>"; };
+		C173912A2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSStatusBarButton+Extensions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +236,8 @@
 				921181C622E0192A00591FDA /* Colors.xcassets */,
 				9242A5681A82A136005AA4B3 /* MainMenu.xib */,
 				922B6B911A856A7D00DEA9CD /* SBCalendar.h */,
+				C17391292B93B1C0004FC6BA /* NSStatusBarButton+Extensions.h */,
+				C173912A2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m */,
 				9242A5611A82A136005AA4B3 /* AppDelegate.h */,
 				9242A5621A82A136005AA4B3 /* AppDelegate.m */,
 				922D9B241DC7A1C90050AB2F /* MoUtils.h */,
@@ -434,6 +439,7 @@
 				9242A5651A82A136005AA4B3 /* main.m in Sources */,
 				92B28CCF210BD17500485AE2 /* Sizer.m in Sources */,
 				9278CADB1A990462004B6BB9 /* MoTableView.m in Sources */,
+				C173912B2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m in Sources */,
 				929223EB1E2D6E0900F1A119 /* HighlightPicker.m in Sources */,
 				925B47181A93B63100E0329A /* MoCalToolTipWC.m in Sources */,
 				9242A5871A82A1A1005AA4B3 /* ItsycalWindow.m in Sources */,
