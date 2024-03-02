@@ -129,7 +129,7 @@
     [vfl :@"H:|-9-[_moCal]-9-|"];
     [vfl :@"H:|[agenda]|"];
     [vfl :@"H:|-8-[_btnAdd]-(>=0)-[_btnPin]-6-[_btnCal]-6-[_btnOpt]-8-|" :NSLayoutFormatAlignAllCenterY];
-    [vfl :@"V:|-16-[_moCal]-6-[_btnOpt(22)]-1-[agenda]-8-|"];
+    [vfl :@"V:|-16-[_moCal]-6-[agenda]-6-[_btnOpt(22)]-8-|"];
 
     self.view = v;
 }
