@@ -24,7 +24,6 @@
         _hoverBox.boxType = NSBoxCustom;
         _hoverBox.borderWidth = 0;
         _hoverBox.cornerRadius = 4;
-        _hoverBox.alphaValue = 0.08;
         _hoverBox.fillColor = NSColor.clearColor;
         _hoverBox.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
         _hoverBox.frame = self.bounds;
@@ -113,7 +112,7 @@
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         context.duration = 0.15;
-        _hoverBox.animator.fillColor = show && self.enabled ? NSColor.controlTextColor : NSColor.clearColor;
+        _hoverBox.animator.fillColor = show && self.enabled ? NSColor.quaternaryLabelColor : NSColor.clearColor;
     }];
 }
 

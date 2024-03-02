@@ -101,8 +101,10 @@
         [btn setAction:action];
         [btn setToolTip:tip];
         [btn setImage:[NSImage imageNamed:imageName]];
+        [btn setAlternateImage:NULL];
         [btn setKeyEquivalent:key];
         [btn setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
+        [btn setContentTintColor:NSColor.secondaryLabelColor];
         [v addSubview:btn];
         return btn;
     };
