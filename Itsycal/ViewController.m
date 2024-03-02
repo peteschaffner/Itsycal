@@ -867,6 +867,7 @@
     [self positionItsycalWindow];
     [self.itsycalWindow makeKeyAndOrderFront:self];
     [self.itsycalWindow makeFirstResponder:_moCal];
+    [_statusItem.button setHighlighted:YES];
     _inactiveTime = 0;
 }
 
@@ -874,6 +875,7 @@
 {
     [self.itsycalWindow orderOut:self];
     [_newEventPopover close];
+    [_statusItem.button setHighlighted:NO];
     _inactiveTime = MonotonicClockTime();
 }
 
