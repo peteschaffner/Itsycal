@@ -115,7 +115,6 @@
     _btnOpt = btn(@"btnOpt", NSLocalizedString(@"Options", @""), @"", @selector(showOptionsMenu:));
     _btnPin = btn(@"btnPin", NSLocalizedString(@"Pin Itsycal   P", @""), @"p", @selector(pin:));
     _btnPin.keyEquivalentModifierMask = 0;
-    _btnPin.alternateImage = [NSImage imageNamed:@"btnPinAlt"];
     [_btnPin setButtonType:NSButtonTypeToggle];
     
     // Agenda
@@ -392,6 +391,7 @@
 - (void)pin:(id)sender
 {
     BOOL pin = _btnPin.state == NSControlStateValueOn;
+    [_btnPin setContentTintColor:pin ? NSColor.controlAccentColor : NSColor.secondaryLabelColor];
     [[NSUserDefaults standardUserDefaults] setBool:pin forKey:kPinItsycal];
 }
 
