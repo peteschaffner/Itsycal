@@ -192,6 +192,7 @@
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     _btnPin.state = [defaults boolForKey:kPinItsycal] ? NSControlStateValueOn : NSControlStateValueOff;
+    [self updatePinColor];
     _moCal.showWeeks = [defaults boolForKey:kShowWeeks];
 
     [self.itsycalWindow makeFirstResponder:_moCal];
@@ -380,8 +381,14 @@
 - (void)pin:(id)sender
 {
     BOOL pin = _btnPin.state == NSControlStateValueOn;
-    [_btnPin setContentTintColor:pin ? NSColor.controlAccentColor : NSColor.secondaryLabelColor];
     [[NSUserDefaults standardUserDefaults] setBool:pin forKey:kPinItsycal];
+    [self updatePinColor];
+}
+
+- (void)updatePinColor
+{
+    BOOL pin = _btnPin.state == NSControlStateValueOn;
+    [_btnPin setContentTintColor:pin ? NSColor.controlAccentColor : NSColor.secondaryLabelColor];
 }
 
 - (NSWindowController *)prefsWC
