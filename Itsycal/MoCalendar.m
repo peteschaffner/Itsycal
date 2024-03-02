@@ -216,6 +216,7 @@ NSString * const kMoCalendarNumRows = @"MoCalendarNumRows";
 {
     _showWeeks = showWeeks;
     CGFloat constant = showWeeks ? NSWidth(_weekGrid.frame) : 2;
+    [self updateCalendar];
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *ctx) {
         [ctx setDuration:0.1];
         [self->_weeksConstraint.animator setConstant:constant];
@@ -348,7 +349,7 @@ NSString * const kMoCalendarNumRows = @"MoCalendarNumRows";
             // If the current column is Monday, use this date to
             // calculate the week number for this row.
             if (col == DOW_COL(self.weekStartDOW, 1)) {
-                [_weekGrid.cells[row] textField].textColor = Theme.weekTextColor;
+                [_weekGrid.cells[row] textField].textColor = _showWeeks ? Theme.weekTextColor : NSColor.clearColor;
                 [_weekGrid.cells[row] textField].integerValue = WeekOfYear(date.year, date.month, date.day);
             }
             date = AddDaysToDate(1, date);
