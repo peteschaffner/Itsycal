@@ -19,7 +19,7 @@
         NSBox *bx = [NSBox new];
         bx.boxType = NSBoxCustom;
         bx.borderWidth = 0;
-        bx.cornerRadius = 3;
+        bx.cornerRadius = 2;
         bx.fillColor = color;
         [self addSubview:bx];
         return bx;
@@ -50,7 +50,7 @@
 - (void)dim:(BOOL)shouldDim
 {
     _bkg.animator.alphaValue = shouldDim ? 0 : 1;
-    _handle.animator.alphaValue = shouldDim ? 0.1 : 1;
+    _handle.animator.alphaValue = shouldDim ? 0.5 : 1;
 }
 
 @end

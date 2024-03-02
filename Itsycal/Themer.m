@@ -92,7 +92,7 @@ Themer *Theme = nil;
 }
 
 - (NSColor *)highlightedDOWBackgroundColor {
-    return [NSColor colorNamed:@"HighlightedDOWBackgroundColor"];
+    return NSColor.quaternaryLabelColor;
 }
 
 - (NSColor *)highlightedDOWTextColor {
@@ -104,7 +104,7 @@ Themer *Theme = nil;
 }
 
 - (NSColor *)mainBackgroundColor {
-    return [NSColor colorNamed:@"MainBackgroundColor"];
+    return NSColor.clearColor;
 }
 
 - (NSColor *)monthTextColor {
@@ -124,7 +124,7 @@ Themer *Theme = nil;
 }
 
 - (NSColor *)resizeHandleForegroundColor {
-    return [NSColor colorNamed:@"ResizeHandleForegroundColor"];
+    return [self hoveredCellColor];
 }
 
 - (NSColor *)selectedCellColor {
