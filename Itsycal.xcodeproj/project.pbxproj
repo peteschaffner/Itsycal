@@ -48,6 +48,7 @@
 		929223EB1E2D6E0900F1A119 /* HighlightPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 929223EA1E2D6E0800F1A119 /* HighlightPicker.m */; };
 		92B28CCF210BD17500485AE2 /* Sizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 92B28CCE210BD17500485AE2 /* Sizer.m */; };
 		92CDDE7B1A955D7F00D7675C /* AgendaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */; };
+		C17391282B926F3C004FC6BA /* PeteWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C17391272B926F3C004FC6BA /* PeteWindow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -161,6 +162,8 @@
 		92B28CCE210BD17500485AE2 /* Sizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Sizer.m; sourceTree = "<group>"; };
 		92CDDE791A955D7F00D7675C /* AgendaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgendaViewController.h; sourceTree = "<group>"; };
 		92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgendaViewController.m; sourceTree = "<group>"; };
+		C17391262B926F3C004FC6BA /* PeteWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeteWindow.h; sourceTree = "<group>"; };
+		C17391272B926F3C004FC6BA /* PeteWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PeteWindow.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +243,8 @@
 				9242A5831A82A189005AA4B3 /* ViewController.m */,
 				9242A5851A82A1A1005AA4B3 /* ItsycalWindow.h */,
 				9242A5861A82A1A1005AA4B3 /* ItsycalWindow.m */,
+				C17391262B926F3C004FC6BA /* PeteWindow.h */,
+				C17391272B926F3C004FC6BA /* PeteWindow.m */,
 				920B5D7A2B4D10B6004A10D3 /* DatePickerVC.h */,
 				920B5D7B2B4D10B6004A10D3 /* DatePickerVC.m */,
 				92CDDE7C1A97FFE700D7675C /* MoCode */,
@@ -447,6 +452,7 @@
 				9242A5841A82A189005AA4B3 /* ViewController.m in Sources */,
 				924C518C1E5F721C0049E3A9 /* MoCalResizeHandle.m in Sources */,
 				921E62CD1E26B3EA007B029F /* PrefsGeneralVC.m in Sources */,
+				C17391282B926F3C004FC6BA /* PeteWindow.m in Sources */,
 				9242A5631A82A136005AA4B3 /* AppDelegate.m in Sources */,
 				921E62D31E26E038007B029F /* PrefsAboutVC.m in Sources */,
 			);

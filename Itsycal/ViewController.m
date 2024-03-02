@@ -10,7 +10,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "ViewController.h"
 #import "Itsycal.h"
-#import "ItsycalWindow.h"
+#import "PeteWindow.h"
 #import "DatePickerVC.h"
 #import "SBCalendar.h"
 #import "EventViewController.h"
@@ -63,14 +63,37 @@
     // View controller content view
     NSView *v = [NSView new];
     v.translatesAutoresizingMaskIntoConstraints = NO;
-    
+    v.wantsLayer = YES;
+    v.layer.cornerRadius = 16;
+    v.layer.cornerCurve = kCACornerCurveContinuous;
+
+    NSVisualEffectView *ev = [NSVisualEffectView new];
+    ev.frame = v.bounds;
+    ev.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    ev.blendingMode = NSVisualEffectBlendingModeBehindWindow;
+    ev.material = NSVisualEffectMaterialPopover;
+    ev.state = NSVisualEffectStateActive;
+
+    [v addSubview:ev];
+
+    NSView *innerStroke = [NSView new];
+    innerStroke.frame = v.bounds;
+    innerStroke.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    innerStroke.wantsLayer = YES;
+    innerStroke.layer.borderColor = [NSColor.whiteColor colorWithAlphaComponent:0.2].CGColor;
+    innerStroke.layer.borderWidth = 1;
+    innerStroke.layer.cornerRadius = v.layer.cornerRadius;
+    innerStroke.layer.cornerCurve = v.layer.cornerCurve;
+
+    [v addSubview:innerStroke];
+
     // MoCalendar
     _moCal = [MoCalendar new];
     _moCal.delegate = self;
     _moCal.target = self;
     _moCal.doubleAction = @selector(addCalendarEvent:);
     [v addSubview:_moCal];
-    
+
     // Convenience function to config buttons.
     MoButton* (^btn)(NSString*, NSString*, NSString*, SEL) = ^MoButton* (NSString *imageName, NSString *tip, NSString *key, SEL action) {
         MoButton *btn = [MoButton new];
@@ -102,11 +125,11 @@
 
     // Constraints
     MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:v metrics:nil views:NSDictionaryOfVariableBindings(_moCal, _btnAdd, _btnCal, _btnOpt, _btnPin, agenda)];
-    [vfl :@"H:|-2-[_moCal]-2-|"];
+    [vfl :@"H:|-9-[_moCal]-9-|"];
     [vfl :@"H:|[agenda]|"];
     [vfl :@"H:|-8-[_btnAdd]-(>=0)-[_btnPin]-6-[_btnCal]-6-[_btnOpt]-8-|" :NSLayoutFormatAlignAllCenterY];
-    [vfl :@"V:|[_moCal]-6-[_btnOpt(22)]-1-[agenda]-(-1)-|"];
-    
+    [vfl :@"V:|-16-[_moCal]-6-[_btnOpt(22)]-1-[agenda]-8-|"];
+
     self.view = v;
 }
 
@@ -824,9 +847,9 @@
 #pragma mark -
 #pragma mark Window management
 
-- (ItsycalWindow *)itsycalWindow
+- (PeteWindow *)itsycalWindow
 {
-    return (ItsycalWindow *)self.view.window;
+    return (PeteWindow *)self.view.window;
 }
 
 - (void)showItsycalWindow
