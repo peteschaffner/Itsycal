@@ -59,10 +59,18 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @implementation AgendaViewController
 {
     NSPopover *_popover;
+    CGFloat _windowTopMargin;
 }
 
 - (void)loadView
 {
+    // Create some vertical padding inside the tooltip windows
+    if ([NSStringFromClass([self class]) isEqualToString:@"TooltipViewController"]) {
+        _windowTopMargin = 8.0;
+    } else {
+        _windowTopMargin = 0.0;
+    }
+
     // View controller content view
     NSView *v = [NSView new];
 
@@ -98,8 +106,8 @@ static NSString *kEventCellIdentifier = @"EventCell";
     
     [v addSubview:tvContainer];
     [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tv]|" options:0 metrics:nil views:@{@"tv": tvContainer}]];
-    [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tv]|" options:0 metrics:nil views:@{@"tv": tvContainer}]];
-    
+    [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(m)-[tv]|" options:0 metrics:@{ @"m" : @(_windowTopMargin) } views:@{@"tv": tvContainer}]];
+
     self.view = v;
 }
 
@@ -137,7 +145,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // I have no idea why setting `preferredContentSize` via a call to
     // `-performSelectorOnMainThread:withObject:waitUntilDone` works while
     // simply setting it here as we used to do no longer does.
-    NSSize prefSize = NSMakeSize(NSWidth(_tv.frame), height);
+    self.preferredContentSize = NSMakeSize(NSWidth(_tv.frame), height + _windowTopMargin * 2);
     NSValue *value = [NSValue valueWithSize:prefSize];
     [self performSelectorOnMainThread:@selector(setPreferredContentSizeHack:) 
                            withObject:value waitUntilDone:NO];
