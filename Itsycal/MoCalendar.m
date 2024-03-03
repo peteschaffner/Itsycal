@@ -252,20 +252,7 @@ NSString * const kMoCalendarNumRows = @"MoCalendarNumRows";
 {
     _tooltipVC = tooltipVC;
     _tooltipWC.vc = tooltipVC;
-
-    NSView *contentView = _tooltipWC.window.contentView;
-    
-    // Remove all subviews of tooltip window's contentView.
-    [contentView setSubviews:@[]];
-
-    // Add the tooltopVC's view as a subview of the tooltip
-    // window's contentView.
-    if (tooltipVC != nil) {
-        tooltipVC.view.translatesAutoresizingMaskIntoConstraints = NO;
-        [contentView addSubview:tooltipVC.view];
-        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(-3)-[v]-(-3)-|" options:0 metrics:nil views:@{@"v":_tooltipVC.view}]];
-        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-2-[v]-2-|" options:0 metrics:nil views:@{@"v":_tooltipVC.view}]];
-    }
+    _tooltipWC.contentViewController = tooltipVC;
 }
 
 - (IBAction)showPreviousMonth:(id)sender

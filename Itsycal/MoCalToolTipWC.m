@@ -129,15 +129,17 @@
         self.movableByWindowBackground = NO;
         self.ignoresMouseEvents = YES;
         self.hasShadow = YES;
-
-        // Draw tooltip background and fix tooltip width.
-        self.contentView = [MoCalTooltipContentView new];
-        _tooltipWidthConstraint = [self.contentView.widthAnchor constraintEqualToConstant:SizePref.tooltipWidth];
-        _tooltipWidthConstraint.active = YES;
-        
-        REGISTER_FOR_SIZE_CHANGE;
     }
     return self;
+}
+
+- (void)setContentViewController:(NSViewController *)contentViewController
+{
+    _tooltipWidthConstraint = [contentViewController.view.widthAnchor constraintEqualToConstant:SizePref.tooltipWidth];
+    _tooltipWidthConstraint.active = YES;
+    [super setContentViewController:contentViewController];
+
+    REGISTER_FOR_SIZE_CHANGE;
 }
 
 - (void)sizeChanged:(id)sender
