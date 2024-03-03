@@ -897,6 +897,12 @@
     }
 }
 
+- (void)windowDidChangeOcclusionState:(NSNotification *)notification
+{
+    // We have to do this because of the fancy window drawing
+    [self.itsycalWindow invalidateShadow];
+}
+
 - (void)popoverDidClose:(NSNotification *)notification
 {
     if (notification.object == _newEventPopover) {
