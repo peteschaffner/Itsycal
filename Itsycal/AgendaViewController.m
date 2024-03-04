@@ -157,8 +157,6 @@ static NSString *kEventCellIdentifier = @"EventCell";
     self.preferredContentSize = value.sizeValue;
 }
 
-}
-
 - (void)updateViewConstraints
 {
     // Tell _tv that row heights need to be recalculated.

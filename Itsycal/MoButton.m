@@ -8,9 +8,12 @@
 
 #import "MoButton.h"
 
+@interface PassThroughBoxView : NSBox
+@end
+
 @implementation MoButton
 {
-    NSBox *_hoverBox;
+    PassThroughBoxView *_hoverBox;
 }
 
 - (instancetype)initWithFrame:(NSRect)frameRect
@@ -20,7 +23,7 @@
         self.bordered = NO;
         self.imagePosition = NSImageOnly;
         [self setButtonType:NSButtonTypeMomentaryChange];
-        _hoverBox = [NSBox new];
+        _hoverBox = [PassThroughBoxView new];
         _hoverBox.boxType = NSBoxCustom;
         _hoverBox.borderWidth = 0;
         _hoverBox.cornerRadius = 4;
@@ -114,6 +117,21 @@
         context.duration = 0.15;
         _hoverBox.animator.fillColor = show && self.enabled ? NSColor.quaternaryLabelColor : NSColor.clearColor;
     }];
+}
+
+@end
+
+#pragma mark PassThroughGridView
+
+// =========================================================================
+// PassThroughBoxView
+// =========================================================================
+
+@implementation PassThroughBoxView
+
+- (NSView *)hitTest:(NSPoint)point
+{
+    return nil;
 }
 
 @end
