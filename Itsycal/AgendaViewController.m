@@ -106,7 +106,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     
     [v addSubview:tvContainer];
     [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tv]|" options:0 metrics:nil views:@{@"tv": tvContainer}]];
-    [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(m)-[tv]|" options:0 metrics:@{ @"m" : @(_windowTopMargin) } views:@{@"tv": tvContainer}]];
+    [v addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(m)-[tv]-(m)-|" options:0 metrics:@{ @"m" : @(_windowTopMargin) } views:@{@"tv": tvContainer}]];
 
     self.view = v;
 }
