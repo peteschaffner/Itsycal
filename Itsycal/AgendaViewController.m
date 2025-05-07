@@ -145,7 +145,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
     // I have no idea why setting `preferredContentSize` via a call to
     // `-performSelectorOnMainThread:withObject:waitUntilDone` works while
     // simply setting it here as we used to do no longer does.
-    self.preferredContentSize = NSMakeSize(NSWidth(_tv.frame), height + _windowTopMargin * 2);
+    NSSize prefSize = NSMakeSize(NSWidth(_tv.frame), height + _windowTopMargin * 2);
     NSValue *value = [NSValue valueWithSize:prefSize];
     [self performSelectorOnMainThread:@selector(setPreferredContentSizeHack:) 
                            withObject:value waitUntilDone:NO];
