@@ -35,6 +35,8 @@
     }
     return result;
 }
+
+- (BOOL)allowsVibrancy { return YES; }
 @end
 
 // These values map to _alertAllDayStrings and _alertRegularStrings.
@@ -87,6 +89,7 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
             txt.bezeled = NO;
             txt.focusRingType = NSFocusRingTypeNone;
             txt.drawsBackground = NO;
+            txt.textColor = NSColor.textColor;
         }
         else {
             txt = [NSTextField labelWithString:stringValue];
@@ -213,7 +216,7 @@ const NSTimeInterval kAlertRegularRelativeOffsets[kAlertRegularNumOffsets] = {
     _notes = [[HackyTextView alloc] initWithFrame:NSMakeRect(0, 0, noteContentSize.width, noteContentSize.height)];
     _notes.delegate = self;
     _notes.font = _location.font; // _title.font is too big
-    _notes.placeholderAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add Notes", @"") attributes:@{NSFontAttributeName: _notes.font, NSForegroundColorAttributeName: NSColor.disabledControlTextColor}];
+    _notes.placeholderAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add Notes", @"") attributes:@{NSFontAttributeName: _notes.font, NSForegroundColorAttributeName: NSColor.placeholderTextColor}];
     _notes.allowsUndo = YES;
     _notes.drawsBackground = NO;
     _notes.richText = NO;
