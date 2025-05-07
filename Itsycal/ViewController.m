@@ -873,10 +873,12 @@
 
 - (void)hideItsycalWindow
 {
-    [self.itsycalWindow orderOut:self];
-    [_newEventPopover close];
-    [_statusItem.button setHighlighted:NO];
-    _inactiveTime = MonotonicClockTime();
+    if (!_newEventPopover.shown) {
+        [self.itsycalWindow orderOut:self];
+        [_newEventPopover close];
+        [_statusItem.button setHighlighted:NO];
+        _inactiveTime = MonotonicClockTime();
+    }
 }
 
 - (void)cancel:(id)sender
