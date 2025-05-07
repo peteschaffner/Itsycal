@@ -44,7 +44,7 @@ static const CGFloat kMinimumSpaceBetweenWindowAndScreenEdge = 10;
     // First, center window under status item.
     CGFloat w = NSWidth(self.frame);
     CGFloat x = roundf(NSMidX(rect) - w / 2);
-    CGFloat y = NSMinY(rect) - 7;
+    CGFloat y = NSMinY(rect) - 6;
 
     // If the calculated x position puts the window too
     // far to the right, shift the window left.
