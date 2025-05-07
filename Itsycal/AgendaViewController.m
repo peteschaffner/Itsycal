@@ -13,10 +13,12 @@
 #import "MoVFLHelper.h"
 #import "Themer.h"
 #import "Sizer.h"
+#import "Things3.h"
 
 static NSString *kColumnIdentifier    = @"Column";
 static NSString *kDateCellIdentifier  = @"DateCell";
 static NSString *kEventCellIdentifier = @"EventCell";
+static NSString *kTodoCellIdentifier = @"TodoCell";
 
 @interface ThemedScroller : NSScroller
 @end
@@ -29,6 +31,11 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @property (nonatomic) NSTextField *dayTextField;
 @property (nonatomic) NSTextField *DOWTextField;
 @property (nonatomic, weak) NSDate *date;
+@end
+
+@interface AgendaTodoCell : NSView
+@property (nonatomic) NSTextField *title;
+@property (nonatomic) NSButton *btnEvent;
 @end
 
 @interface AgendaEventCell : NSView
@@ -44,6 +51,7 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @interface AgendaPopoverVC : NSViewController
 @property (nonatomic, weak) NSCalendar *nsCal;
 @property (nonatomic) NSButton *btnDelete;
+@property (nonatomic) NSButton *btnShowCalApp;
 - (void)populateWithEventInfo:(EventInfo *)info;
 - (void)scrollToTopAndFlashScrollers;
 - (NSSize)size;
@@ -298,33 +306,96 @@ static NSString *kEventCellIdentifier = @"EventCell";
 
 - (void)showPopover:(id)sender
 {
-    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow] ||
-        [self tableView:_tv isEmptyEventRow:_tv.clickedRow]) return;
+    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
 
-    [self showPopoverForRow:_tv.clickedRow];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        self->_popover = [NSPopover new];
+        self->_popover.contentViewController = [AgendaPopoverVC new];
+        self->_popover.behavior = NSPopoverBehaviorTransient;
+        self->_popover.animates = NO;
+    });
+
+    AgendaEventCell *cell = [_tv viewAtColumn:0 row:_tv.clickedRow makeIfNecessary:NO];
+
+    if (!cell) return; // should never happen
+
+    AgendaPopoverVC *popoverVC = (AgendaPopoverVC *)_popover.contentViewController;
+    [popoverVC setNsCal:self.nsCal];
+    [popoverVC populateWithEventInfo:cell.eventInfo];
+
+    if (cell.eventInfo.event.calendar.allowsContentModifications) {
+        popoverVC.btnDelete.tag = _tv.clickedRow;
+        popoverVC.btnDelete.target = self;
+        popoverVC.btnDelete.action = @selector(deleteEvent:);
+        unichar backspaceKey = NSBackspaceCharacter;
+        popoverVC.btnDelete.keyEquivalent = [NSString stringWithCharacters:&backspaceKey length:1];
+    }
+
+    popoverVC.btnShowCalApp.tag = [_tv rowForView:cell];
+    popoverVC.btnShowCalApp.target = self;
+    popoverVC.btnShowCalApp.action = @selector(showCalendarApp:);
+
+    NSRect positionRect = NSInsetRect([_tv rectOfRow:_tv.clickedRow], 8, 0);
+    [_popover setAppearance:NSApp.effectiveAppearance];
+    [_popover showRelativeToRect:positionRect ofView:_tv preferredEdge:NSRectEdgeMinX];
+    [_popover setContentSize:popoverVC.size];
+    [popoverVC scrollToTopAndFlashScrollers];
+
+    // Prevent popoverVC's _note from eating key presses (like esc and delete).
+    [popoverVC.view.window makeFirstResponder:popoverVC.btnDelete];
 }
 
 - (void)showCalendarApp:(id)sender
 {
-    if (_tv.clickedRow == -1 || [self tableView:_tv isGroupRow:_tv.clickedRow]) return;
+    NSInteger row = -1;
+    if ([sender isKindOfClass:[NSButton class]]) {
+        NSButton *button = (NSButton *)sender;
+        row = button.tag;
+    } else if (_tv.clickedRow != -1 || ![self tableView:_tv isGroupRow:_tv.clickedRow]) {
+        row = _tv.clickedRow;
+    } else return;
 
-    // Work backwards from the clicked row (which is an EventInfo row)
-    // to find the parent NSDate row. We do this instead of just getting
-    // the clicked event's startDate because spanning events might start
-    // on a different date from the one that was clicked.
-    NSDate *clickedDate = nil;
-    NSInteger row = _tv.clickedRow;
-    while (row > 0) {
-        row = row - 1;
-        id obj = self.events[row];
-        if ([obj isKindOfClass:[NSDate class]]) {
-            clickedDate = obj;
-            break;
+    // Open Calendar.app with the given event selected.
+    EKEvent *event = ((EventInfo *)self.events[row]).event;
+    NSString *eventID = event.calendarItemIdentifier;
+    NSString *path;
+    if (event.hasRecurrenceRules) {
+        NSDate *safeStartDate = event.startDate ? event.startDate : NSDate.distantFuture;
+        NSLocale *locale;
+        NSTimeZone *timeZone;
+        NSDateFormatter *dateFormatter = [NSDateFormatter new];
+        dateFormatter.dateFormat = @"yyyyMMdd'T'HHmmss'Z'";
+        if (event.isAllDay) {
+            locale = NSLocale.currentLocale;
+            timeZone = NSTimeZone.localTimeZone;
+        } else {
+            locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+            timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
         }
+        dateFormatter.locale = locale;
+        dateFormatter.timeZone = timeZone;
+        NSString *formattedDate = [dateFormatter stringFromDate:safeStartDate];
+
+        path = [NSString stringWithFormat:@"ical://ekevent/%@/%@?method=show&options=more", formattedDate, eventID];
+    } else {
+        path = [NSString stringWithFormat:@"ical://ekevent/%@?method=show&options=more", eventID];
     }
-    if (!clickedDate) return; // should never happen
-    if (self.delegate && [self.delegate respondsToSelector:@selector(agendaShowCalendarAppAtDate:)]) {
-        [self.delegate agendaShowCalendarAppAtDate:clickedDate];
+
+    NSURL *url = [NSURL URLWithString:path];
+    dispatch_async(dispatch_get_global_queue(NSOperationQualityOfServiceUserInitiated, 0), ^{
+        [NSWorkspace.sharedWorkspace openURL:url];
+    });
+
+    return;
+}
+
+- (void)showThingsApp:(id)sender
+{
+    if ([sender isKindOfClass:[NSButton class]]) {
+        NSButton *btn = sender;
+        Things3ToDo *todo = ((Things3ToDo *)self.events[btn.tag]);
+        [todo edit];
     }
 }
 
@@ -364,6 +435,21 @@ static NSString *kEventCellIdentifier = @"EventCell";
             cell.dayTextField.textColor = NSColor.tertiaryLabelColor;
             cell.DOWTextField.textColor = NSColor.tertiaryLabelColor;
         }
+        v = cell;
+    }
+    else if ([obj isKindOfClass:SBObject.class]) {
+        Things3ToDo *todo = obj;
+        NSString *title = todo.name;
+        AgendaTodoCell *cell = [_tv makeViewWithIdentifier:kTodoCellIdentifier owner:self];
+        if (cell == nil) cell = [AgendaTodoCell new];
+
+        if (title) {
+            cell.title.stringValue = todo.name;
+            cell.btnEvent.target = self;
+            cell.btnEvent.action = @selector(showThingsApp:);
+            cell.btnEvent.tag = row;
+        }
+
         v = cell;
     }
     else {
@@ -754,6 +840,71 @@ static NSString *kEventCellIdentifier = @"EventCell";
 @end
 
 // =========================================================================
+// AgendaTodoCell
+// =========================================================================
+
+@implementation AgendaTodoCell {
+    NSLayoutConstraint *_leadingConstraint;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.identifier = kTodoCellIdentifier;
+
+        _title = [NSTextField labelWithString:@""];
+        _title.translatesAutoresizingMaskIntoConstraints = NO;
+        _title.font = [NSFont systemFontOfSize:SizePref.fontSize];
+        _title.lineBreakMode = NSLineBreakByWordWrapping;
+        _title.cell.truncatesLastVisibleLine = YES;
+        _title.maximumNumberOfLines = 1;
+
+        [self addSubview:_title];
+
+        CGFloat leadingConstant = SizePref.agendaEventLeadingMargin;
+        _leadingConstraint = [_title.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:leadingConstant];
+        _leadingConstraint.active = YES;
+        [_title.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-11].active = YES;
+        [_title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+
+        // This button handles opening the todo popover.
+        _btnEvent = [NSButton new];
+        _btnEvent.title = @"";
+        _btnEvent.bordered = 0;
+        _btnEvent.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        [self addSubview:_btnEvent];
+
+        REGISTER_FOR_SIZE_CHANGE;
+    }
+    return self;
+}
+
+- (void)sizeChanged:(id)sender
+{
+    _leadingConstraint.constant = SizePref.agendaEventLeadingMargin;
+    _title.font = [NSFont systemFontOfSize:SizePref.fontSize];
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+    // Draw colored dot. Dot is elongated for all-day events.
+    // Stroke for tentative and pending events, otherwise fill.
+    CGFloat x = 10.75;
+    CGFloat yOffset = SizePref.fontSize + 2.75;
+    CGFloat dotWidthX = SizePref.agendaDotWidth + 0.5;
+    CGFloat dotWidthY = dotWidthX;
+    CGFloat radius = 1.5;
+    NSColor *dotColor = [NSColor colorWithRed:0.424 green:0.604 blue:0.933 alpha:1.0];
+    [dotColor set];
+    NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(x, NSHeight(self.bounds) - yOffset, dotWidthX, dotWidthY) xRadius:radius yRadius:radius];
+    p.lineWidth = 1.4;
+    [p stroke];
+}
+
+@end
+
+// =========================================================================
 // AgendaEventCell
 // =========================================================================
 
@@ -991,22 +1142,29 @@ static NSString *kEventCellIdentifier = @"EventCell";
         _title = label();
         _duration = label();
         _recurrence = label();
-        
+
         _location = textview();
         _note = textview();
         _URL = textview();
-        
+
         _btnDelete = [NSButton new];
         _btnDelete.title = @"⌫";
         _btnDelete.focusRingType = NSFocusRingTypeNone;
         _btnDelete.bordered = NO;
         _btnDelete.contentTintColor = NSColor.secondaryLabelColor;
-        
+
+        _btnShowCalApp = [NSButton new];
+        _btnShowCalApp.bordered = NO;
+        _btnShowCalApp.imagePosition = NSImageOnly;
+        _btnShowCalApp.image = [[NSImage imageWithSystemSymbolName:@"arrow.right.circle" accessibilityDescription:NULL] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithPointSize:10 weight:NSFontWeightSemibold]];
+        _btnShowCalApp.focusRingType = NSFocusRingTypeNone;
+
         NSView *titleHolder = [NSView new];
         [titleHolder addSubview:_title];
         [titleHolder addSubview:_btnDelete];
-        MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:titleHolder metrics:nil views:NSDictionaryOfVariableBindings(_title, _btnDelete)];
-        [vfl :@"H:|[_title]-(>=10)-[_btnDelete]|" :NSLayoutFormatAlignAllCenterY];
+        [titleHolder addSubview:_btnShowCalApp];
+        MoVFLHelper *vfl = [[MoVFLHelper alloc] initWithSuperview:titleHolder metrics:nil views:NSDictionaryOfVariableBindings(_title, _btnShowCalApp, _btnDelete)];
+        [vfl :@"H:|[_title]-2-[_btnShowCalApp]-(>=10)-[_btnDelete]|" :NSLayoutFormatAlignAllCenterY];
         [vfl :@"V:|[_title]|"];
         [titleHolder.widthAnchor constraintEqualToConstant:POPOVER_TEXT_WIDTH].active = YES;
         

@@ -22,6 +22,7 @@
 #import "MoVFLHelper.h"
 #import "MoUtils.h"
 #import "Sparkle/SUUpdater.h"
+#import "Things3.h"
 
 @implementation ViewController
 {
@@ -863,6 +864,10 @@
 
 - (void)showItsycalWindow
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateAgenda];
+    });
+
     [[NSApplication sharedApplication] unhideWithoutActivation];
     [self positionItsycalWindow];
     [self.itsycalWindow makeKeyAndOrderFront:self];
@@ -941,7 +946,7 @@
     if (row == -1) {
         [_moCal unhighlightCells];
     }
-    else {
+    else if([_agendaVC.events[row] isKindOfClass:EventInfo.class]) {
         EventInfo *info = _agendaVC.events[row];
         MoDate startDate = MakeDateWithNSDate(info.event.startDate, _nsCal);
         MoDate endDate   = MakeDateWithNSDate(info.event.endDate,   _nsCal);
@@ -1081,6 +1086,15 @@
             [nsDate setHasNoEvents:NO];
             [datesAndEvents addObject:nsDate];
             [datesAndEvents addObjectsFromArray:events];
+
+            // Add today's todos from Things.app
+            if (CompareDates(date, [self todayDate]) == 0) {
+                Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
+                Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
+                NSArray *todos = [todayList.toDos get];
+                NSArray *openTodos = [todos filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"status == %d", Things3StatusOpen]];
+                [datesAndEvents addObjectsFromArray:openTodos];
+            }
         }
         else {
             if ([[NSUserDefaults standardUserDefaults] boolForKey:kShowDaysWithNoEventsInAgenda]) {
