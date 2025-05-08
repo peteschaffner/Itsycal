@@ -163,6 +163,7 @@
 		92B28CCE210BD17500485AE2 /* Sizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Sizer.m; sourceTree = "<group>"; };
 		92CDDE791A955D7F00D7675C /* AgendaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgendaViewController.h; sourceTree = "<group>"; };
 		92CDDE7A1A955D7F00D7675C /* AgendaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgendaViewController.m; sourceTree = "<group>"; };
+		C14822072DCC2F3400E208C8 /* Things3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Things3.h; sourceTree = "<group>"; };
 		C17391262B926F3C004FC6BA /* PeteWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeteWindow.h; sourceTree = "<group>"; };
 		C17391272B926F3C004FC6BA /* PeteWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PeteWindow.m; sourceTree = "<group>"; };
 		C17391292B93B1C0004FC6BA /* NSStatusBarButton+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSStatusBarButton+Extensions.h"; sourceTree = "<group>"; };
@@ -235,6 +236,7 @@
 				9242A5661A82A136005AA4B3 /* Images.xcassets */,
 				921181C622E0192A00591FDA /* Colors.xcassets */,
 				9242A5681A82A136005AA4B3 /* MainMenu.xib */,
+				C14822072DCC2F3400E208C8 /* Things3.h */,
 				922B6B911A856A7D00DEA9CD /* SBCalendar.h */,
 				C17391292B93B1C0004FC6BA /* NSStatusBarButton+Extensions.h */,
 				C173912A2B93B1C0004FC6BA /* NSStatusBarButton+Extensions.m */,
