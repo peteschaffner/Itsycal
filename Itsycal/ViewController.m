@@ -1075,6 +1075,14 @@
     return _filteredEventsForDate[nsDate];
 }
 
+- (NSArray *)todosForToday
+{
+    Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
+    Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
+    NSArray *todos = [todayList.toDos get];
+    return [todos filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"status == %d", Things3StatusOpen]];
+}
+
 - (NSArray *)datesAndEventsForDate:(MoDate)date days:(NSInteger)days
 {
     NSMutableArray *datesAndEvents = [NSMutableArray new];
@@ -1082,21 +1090,15 @@
     while (CompareDates(date, endDate) < 0) {
         NSDate *nsDate = MakeNSDateWithDate(date, _nsCal);
         NSArray *events = _filteredEventsForDate[nsDate];
+        NSArray *todos = [self todosForToday];
+        
         if (events != nil) {
             [nsDate setHasNoEvents:NO];
             [datesAndEvents addObject:nsDate];
             [datesAndEvents addObjectsFromArray:events];
-
-            // Add today's todos from Things.app
-            if (CompareDates(date, [self todayDate]) == 0) {
-                Things3Application *thingsApp = [SBApplication applicationWithBundleIdentifier:@"com.culturedcode.ThingsMac"];
-                Things3List *todayList = [thingsApp.lists objectWithName:@"Today"];
-                NSArray *todos = [todayList.toDos get];
-                NSArray *openTodos = [todos filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"status == %d", Things3StatusOpen]];
-                [datesAndEvents addObjectsFromArray:openTodos];
-            }
         }
         else {
+            [nsDate setHasNoEvents:YES];
             if ([[NSUserDefaults standardUserDefaults] boolForKey:kShowDaysWithNoEventsInAgenda]) {
                 // If the user wants to show days with no events in the agenda,
                 // we need the objects we add to `datesAndEvents` to be
@@ -1105,11 +1107,20 @@
                 // For the event we give it a new EventInfo. Importantly, the
                 // EventInfo's `event` property will be nil and we will use
                 // this fact in AgendaViewController.
-                [nsDate setHasNoEvents:YES];
                 [datesAndEvents addObject:nsDate];
                 [datesAndEvents addObject:[EventInfo new]];
             }
         }
+        
+        if (CompareDates(date, [self todayDate]) == 0 && todos.count != 0) {
+            if ([nsDate hasNoEvents]) {
+                [nsDate setHasNoEvents:NO];
+                [datesAndEvents addObject:nsDate];
+            }
+            
+            [datesAndEvents addObjectsFromArray:todos];
+        }
+        
         date = AddDaysToDate(1, date);
     }
     return datesAndEvents;
